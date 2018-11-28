@@ -44,7 +44,7 @@ bool RayBoxIntersection(const Ray&r, const Vector3& boxPos, const Vector3& boxSi
 bool CollisionDetection::RayAABBIntersection(const Ray&r, const Transform& worldTransform, const AABBVolume& volume, RayCollision& collision) {
 	Vector3 boxPos = worldTransform.GetWorldPosition();
 	 Vector3 boxSize = volume.GetHalfDimensions();
-	 return RayAABBIntersection(r, boxPos, boxSize, collision);
+	 return RayBoxIntersection(r, boxPos, boxSize, collision);
 	
 }
 
@@ -59,7 +59,7 @@ bool CollisionDetection::RayOBBIntersection(const Ray&r, const Transform& worldT
 		 collision.collidedAt = worldTransform.GetWorldMatrix() * collision.collidedAt;
 	}
 	 return collided;
-	 return false;
+	 
 }
 
 bool CollisionDetection::RaySphereIntersection(const Ray&r, const Transform& worldTransform, const SphereVolume& volume, RayCollision& collision) {
@@ -79,7 +79,7 @@ bool CollisionDetection::RaySphereIntersection(const Ray&r, const Transform& wor
 		 sNorm = cos(DegreesToRadians(sNorm * 90.0f));
 		 collision.rayDistance = sphereProj - (sphereRadius * sNorm);
 		 collision.collidedAt = r.GetPosition() +(r.GetDirection() * collision.rayDistance);
-	return false;
+	return true;
 }
 
 Matrix4 GenerateInverseView(const Camera &c) {
@@ -285,17 +285,18 @@ bool NCL::CollisionDetection::RayBoxIntersection(const Ray & r, const Vector3 & 
 	 Vector3 rayDir = r.GetDirection();
      Vector3 tVals;
 	
-		 for (int i = 0; i < 3; ++i) { // get best 3 intersections
-		 if (rayDir[i] > 0) {
+		 for (int i = 0; i < 3; ++i) 
+		 { // get best 3 intersections
+		   if (rayDir[i] > 0) {
 			 tVals[i] = (boxMin[i] - rayPos[i]) / rayDir[i];
 			
-		}
-		 else {
+		    }
+		   else {
 			 tVals[i] = (boxMax[i] - rayPos[i]) / rayDir[i];
 			
-		}
+		   }
 		
-	}
+	    }
 		 Vector3 intersection = rayPos + (rayDir * tVals.GetMaxElement());	 
 			 const float epsilon = 0.0001f; // an amount of leeway in our calcs
 			  for (int i = 0; i < 3; ++i) {

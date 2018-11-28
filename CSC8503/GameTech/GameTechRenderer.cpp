@@ -81,7 +81,9 @@ void GameTechRenderer::SortObjectList() {
 
 void GameTechRenderer::RenderShadowMap() {
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
-	glClear(GL_DEPTH_BUFFER_BIT);	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);	glViewport(0, 0, SHADOWSIZE, SHADOWSIZE);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+	glViewport(0, 0, SHADOWSIZE, SHADOWSIZE);
 
 	glCullFace(GL_FRONT);
 
