@@ -37,9 +37,7 @@ bool CollisionDetection::RayIntersection(const Ray& r,GameObject& object, RayCol
 	return false;
 }
 
-bool RayBoxIntersection(const Ray&r, const Vector3& boxPos, const Vector3& boxSize, RayCollision& collision) {
-	return false;
-}
+
 
 bool CollisionDetection::RayAABBIntersection(const Ray&r, const Transform& worldTransform, const AABBVolume& volume, RayCollision& collision) {
 	Vector3 boxPos = worldTransform.GetWorldPosition();
@@ -307,34 +305,75 @@ bool CollisionDetection::ObjectIntersection(GameObject* a, GameObject* b, Collis
 bool NCL::CollisionDetection::RayBoxIntersection(const Ray & r, const Vector3 & boxPos, const Vector3 & boxSize, RayCollision & collision)
 {
 
+	 //Vector3 boxMin = boxPos - boxSize;
+	 //Vector3 boxMax = boxPos + boxSize;
+  //   Vector3 rayPos = r.GetPosition();
+	 //Vector3 rayDir = r.GetDirection();
+	 //Vector3 tVals(-1, -1, -1);
+	
+		// for (int i = 0; i < 3; ++i) 
+		// { // get best 3 intersections
+		//   if (rayDir[i] > 0) {
+		//	 tVals[i] = (boxMin[i] - rayPos[i]) / rayDir[i];
+		//	
+		//    }
+		//   else {
+		//	 tVals[i] = (boxMax[i] - rayPos[i]) / rayDir[i];
+		//	
+		//   }
+		//
+	 //   }
+		// Vector3 intersection = rayPos + (rayDir * tVals.GetMaxElement());	 
+		//	 const float epsilon = 0.0001f; // an amount of leeway in our calcs
+		//	  for (int i = 0; i < 3; ++i) {
+		//	  if (intersection[i] + epsilon < boxMin[i] ||
+		//		  intersection[i] - epsilon > boxMax[i]) {
+		//		  return false; // best intersection doesn 't touch the box !		 
+		//	 }	 
+		// }
+		//  collision.collidedAt = intersection;
+		//  collision.rayDistance = tVals.GetMaxElement();
+		//  return true;
 	 Vector3 boxMin = boxPos - boxSize;
 	 Vector3 boxMax = boxPos + boxSize;
-     Vector3 rayPos = r.GetPosition();
-	 Vector3 rayDir = r.GetDirection();
-     Vector3 tVals;
-	
-		 for (int i = 0; i < 3; ++i) 
-		 { // get best 3 intersections
-		   if (rayDir[i] > 0) {
-			 tVals[i] = (boxMin[i] - rayPos[i]) / rayDir[i];
-			
-		    }
-		   else {
-			 tVals[i] = (boxMax[i] - rayPos[i]) / rayDir[i];
-			
-		   }
-		
-	    }
-		 Vector3 intersection = rayPos + (rayDir * tVals.GetMaxElement());	 
-			 const float epsilon = 0.0001f; // an amount of leeway in our calcs
-			  for (int i = 0; i < 3; ++i) {
-			  if (intersection[i] + epsilon < boxMin[i] ||
-				  intersection[i] - epsilon > boxMax[i]) {
-				  return false; // best intersection doesn 't touch the box !		 
-			 }	 
+	 Vector3 rayPos = r.GetPosition();
+	  Vector3 rayDir = r.GetDirection();
+	 
+		  Vector3 tVals(-1, -1, -1);
+	 
+		  for (int i = 0; i < 3; ++i) { // get best 3 intersections
+		  if (rayDir[i] > 0) {
+			  tVals[i] = (boxMin[i] - rayPos[i]) / rayDir[i];
+			 
 		 }
-		  collision.collidedAt = intersection;
-		  collision.rayDistance = tVals.GetMaxElement();
+		  else if (rayDir[i] < 0) {
+			  tVals[i] = (boxMax[i] - rayPos[i]) / rayDir[i];
+			 
+		 }
+		 
+	 }
+	  float bestT = tVals.GetMaxElement();
+	  // the rayDir loop above assumes that the ray is infinite both
+		  // backwards and forwards , so we can intersect with
+		  // objects 'behind ' us!
+		  if (bestT < 0.0f) {
+		  return false; // no backwards rays !
+
+	 }
+		  Vector3 intersection = rayPos + (rayDir * bestT);
+		  
+			   const float epsilon = 0.0001f; // an amount of leeway in our calcs
+		  
+			   for (int i = 0; i < 3; ++i) {
+			   if (intersection[i] + epsilon < boxMin[i] ||
+				   intersection[i] - epsilon > boxMax[i]) {
+				  return false; // best intersection doesn 't touch the box !
+				  
+			  }
+			  
+		  }
+		   collision.collidedAt = intersection;
+		   collision.rayDistance = bestT;
 		  return true;
 	
 }
