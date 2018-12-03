@@ -18,9 +18,10 @@ These two variables help define the relationship between positions
 and the forces that are added to objects to change those positions
 
 */
-
-const float PhysicsSystem::UNIT_MULTIPLIER = 100.0f;
-const float PhysicsSystem::UNIT_RECIPROCAL = 1.0f / UNIT_MULTIPLIER;
+//const float PhysicsSystem::UNIT_MULTIPLIER = 100.0f;
+const float PhysicsSystem::UNIT_MULTIPLIER = 1.0f;
+//const float PhysicsSystem::UNIT_RECIPROCAL = 1.0f / UNIT_MULTIPLIER;
+const float PhysicsSystem::UNIT_RECIPROCAL = 1.0f;
 
 PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	applyGravity	= false;
@@ -166,6 +167,9 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 	Transform& transformA = a.GetTransform(); 
 	Transform& transformB = b.GetTransform(); 
 	float totalMass = physA->GetInverseMass() + physB->GetInverseMass();
+	if (totalMass == 0.0f) {
+		return;
+	}
 
 	//Separate them out using projection 
 	transformA.SetWorldPosition(transformA.GetWorldPosition() - (p.normal * p.penetration*(physA ->GetInverseMass() / totalMass))); 
@@ -180,6 +184,10 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 
 	Vector3 contactVelocity = fullVelocityB - fullVelocityA;
 	float impulseForce = Vector3::Dot(contactVelocity, p.normal);
+	if (Vector3::Dot(contactVelocity, p.normal) > 0) {
+		return;
+	}
+
 
 	//now to work out the effect of inertia....
 	Vector3 inertiaA = Vector3::Cross(physA ->GetInertiaTensor() *  Vector3::Cross(relativeA , p.normal), relativeA);
@@ -283,6 +291,9 @@ void PhysicsSystem::IntegrateVelocity(float dt) {
 		Vector3 linearVel = object ->GetLinearVelocity(); 
 		position += linearVel * dt;
 		transform.SetLocalPosition(position); 
+		transform.SetWorldPosition(position);
+
+
 		// Linear Damping 
 		linearVel = linearVel * frameDamping; 
 		object ->SetLinearVelocity(linearVel); 

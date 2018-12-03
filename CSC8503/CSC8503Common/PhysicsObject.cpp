@@ -46,7 +46,7 @@ void PhysicsObject::ClearForces() {
 }
 
 void PhysicsObject::InitCubeInertia() {
-	Vector3 dimensions	= transform->GetLocalScale();
+	Vector3 dimensions	= transform->GetLocalScale()*2;
 	Vector3 dimsSqr		= dimensions * dimensions;
 
 	inverseInertia.x = (12.0f * inverseMass) / (dimsSqr.y + dimsSqr.z);
