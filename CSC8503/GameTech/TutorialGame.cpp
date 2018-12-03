@@ -133,9 +133,6 @@ void TutorialGame::UpdateKeys() {
 			selectionObject->GetPhysicsObject()->AddTorque(Vector3(0, -100, 0));
 		}
 
-		if (Window::GetKeyboard()->KeyDown(KEYBOARD_RIGHT)) {
-			selectionObject->GetPhysicsObject()->AddTorque(Vector3(100, 0, 0));
-		}
 
 		if (Window::GetKeyboard()->KeyDown(KEYBOARD_UP)) {
 			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, -100));
@@ -322,7 +319,7 @@ void TutorialGame::InitSphereAABBTest() {
 	AddCubeToWorld(Vector3(0, 0, 0), cubeSize, 10.0f);
 	AddSphereToWorld(Vector3(2, 0, 0), 5.0f, 10.0f);
 }
-
+						
 void TutorialGame::InitGJKWorld() {
 	Vector3 dimensions(20, 2, 10);
 	float inverseMass = 10.0f;
