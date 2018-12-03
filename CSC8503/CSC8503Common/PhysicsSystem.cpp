@@ -18,10 +18,10 @@ These two variables help define the relationship between positions
 and the forces that are added to objects to change those positions
 
 */
-//const float PhysicsSystem::UNIT_MULTIPLIER = 100.0f;
-const float PhysicsSystem::UNIT_MULTIPLIER = 1.0f;
-//const float PhysicsSystem::UNIT_RECIPROCAL = 1.0f / UNIT_MULTIPLIER;
-const float PhysicsSystem::UNIT_RECIPROCAL = 1.0f;
+const float PhysicsSystem::UNIT_MULTIPLIER = 100.0f;
+//const float PhysicsSystem::UNIT_MULTIPLIER = 1.0f;
+const float PhysicsSystem::UNIT_RECIPROCAL = 1.0f / UNIT_MULTIPLIER;
+//const float PhysicsSystem::UNIT_RECIPROCAL = 1.0f;
 
 PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	applyGravity	= false;
