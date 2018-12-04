@@ -40,7 +40,11 @@ void TutorialGame::InitialiseAssets() {
 	sphereMesh->SetPrimitiveType(GeometryPrimitive::Triangles);
 	sphereMesh->UploadToGPU();
 
+	ballTex = (OGLTexture*)TextureLoader::LoadAPITexture("golfball.jpg");
 	basicTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
+	terrainTex = (OGLTexture*)TextureLoader::LoadAPITexture("Green.png");
+	floorTex = (OGLTexture*)TextureLoader::LoadAPITexture("grass.bmp");
+	obsTex = (OGLTexture*)TextureLoader::LoadAPITexture("brown.jpg");
 	basicShader = new OGLShader("GameTechVert.glsl", "GameTechFrag.glsl");
 
 	InitCamera();
@@ -51,7 +55,12 @@ TutorialGame::~TutorialGame()	{
 	delete cubeMesh;
 	delete sphereMesh;
 	delete basicTex;
+	delete floorTex;
+	delete terrainTex;
+	delete obsTex;
+	delete ballTex;
 	delete basicShader;
+	
 
 	delete physics;
 	delete renderer;
@@ -150,13 +159,28 @@ void TutorialGame::InitCamera() {
 	world->GetMainCamera()->SetPitch(-35.0f);
 	world->GetMainCamera()->SetYaw(320.0f);
 	world->GetMainCamera()->SetPosition(Vector3(-50, 120, 200));
+
+
+	//world->GetMainCamera()->SetNearPlane(3.0f);
+	//world->GetMainCamera()->SetFarPlane(4200.0f);
+	//world->GetMainCamera()->SetPitch(-90.0f);
+	//world->GetMainCamera()->SetYaw(0.0f);
+	//world->GetMainCamera()->SetPosition(Vector3(100,2000,0));
 }
 
 void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	InitCubeGridWorld(5, 5, 50.0f, 50.0f, Vector3(10, 10, 10));
+
+	//Tutorial Origin
+	//InitCubeGridWorld(5, 5, 50.0f, 50.0f, Vector3(10, 10, 10));
+
+	//Coursework One
+	InitQuadEdge();
+	
+	//InitSphereGridWorld(10, 10, 50.0f, 50.0f, 10.0f);
+
 	//InitSphereGridWorld(w, 10, 10, 50.0f, 50.0f, 10.0f);
 
 	//InitSphereGridWorld(w, 1, 1, 50.0f, 50.0f, 10.0f);
@@ -193,7 +217,7 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 	floor->GetTransform().SetWorldScale(floorSize);
 	floor->GetTransform().SetWorldPosition(position);
 
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, floorTex, basicShader));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
 
 	floor->GetPhysicsObject()->SetInverseMass(0);
@@ -220,7 +244,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 	sphere->GetTransform().SetWorldScale(sphereSize);
 	sphere->GetTransform().SetWorldPosition(position);
 
-	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, basicTex, basicShader));
+	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, ballTex, basicShader));
 	sphere->SetPhysicsObject(new PhysicsObject(&sphere->GetTransform(), sphere->GetBoundingVolume()));
 
 	sphere->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -252,6 +276,51 @@ GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimens
 	return cube;
 }
 
+GameObject* TutorialGame::AddTerrainToWorld(const Vector3& position, Vector3 dimensions, float inverseMass) {
+	GameObject* cube = new GameObject();
+
+	AABBVolume* volume = new AABBVolume(dimensions);
+
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform().SetWorldPosition(position);
+	cube->GetTransform().SetWorldScale(dimensions);
+
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, terrainTex, basicShader));
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+
+	cube->GetPhysicsObject()->SetInverseMass(inverseMass);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	world->AddGameObject(cube);
+
+	return cube;
+}
+
+GameObject * NCL::CSC8503::TutorialGame::AddObstacleToWorld(const Vector3 & position, Vector3 dimensions, float inverseMass)
+{
+	GameObject* cube = new GameObject();
+
+	AABBVolume* volume = new AABBVolume(dimensions);
+
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform().SetWorldPosition(position);
+	cube->GetTransform().SetWorldScale(dimensions);
+
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, obsTex, basicShader));
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+
+	cube->GetPhysicsObject()->SetInverseMass(inverseMass);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	world->AddGameObject(cube);
+
+	return cube;
+}
+
+
+
 void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius) {
 	for (int x = 0; x < numCols; ++x) {
 		for (int z = 0; z < numRows; ++z) {
@@ -259,6 +328,11 @@ void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacin
 			AddSphereToWorld(position, radius);
 		}
 	}
+}
+
+void NCL::CSC8503::TutorialGame::InitGolfBall()
+{
+	
 }
 
 void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing) {
@@ -289,6 +363,76 @@ void TutorialGame::InitCubeGridWorld(int numRows, int numCols, float rowSpacing,
 	}
 	AddFloorToWorld(Vector3(10, -100, 1));
 }
+
+void TutorialGame::InitTerrain(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3 & cubeDims)
+{
+	for (int x = 0; x < numCols; ++x) {
+		for (int z = 0; z < numRows; ++z) {
+			//if (x == 1 && z == 5) continue;
+			Vector3 position = Vector3(x * colSpacing, cubeDims.y, z * rowSpacing);
+			AddCubeToWorld(position, cubeDims, 1.0f);
+		}
+	}
+	AddFloorToWorld(Vector3(10, -100, 1));
+}
+
+
+void TutorialGame::InitQuadEdge() {
+
+	//Terrain
+	
+		float holeSize = 25.0f;
+		float depth = holeSize;
+		float blockALong = 1000.0f;
+		int unit = (blockALong / holeSize);
+		int holePosUnit = 6;
+		float blockAWidth = (blockALong - holeSize) *0.5f;
+		float blockBLong = holeSize * holePosUnit;
+		float blockCLong = holeSize * (unit - holePosUnit - 1);
+		float blockBWidth = holeSize;
+		float blockCWidth = holeSize;
+		Vector3 blockA_Dims = Vector3(blockALong, depth, blockAWidth);
+		Vector3 blockB_Dims = Vector3(blockBLong, depth, blockBWidth);
+		Vector3 blockC_Dims = Vector3(blockCLong, depth, blockCWidth);
+
+		Vector3 pos1(0, depth, holeSize + blockAWidth);
+		Vector3 pos2(0, depth, -(holeSize + blockAWidth));
+		Vector3 pos3((unit - holePosUnit)*holeSize, depth, 0);
+		Vector3 pos4((-holePosUnit - 1)*holeSize, depth, 0);
+
+		AddTerrainToWorld(pos1, blockA_Dims, 0.0f);
+		AddTerrainToWorld(pos2, blockA_Dims, 0.0f);
+		AddTerrainToWorld(pos3, blockB_Dims, 0.0f);
+		AddTerrainToWorld(pos4, blockC_Dims, 0.0f);
+	
+
+	//Edge
+	
+		
+		Vector3 EA_Dims = Vector3(790, holeSize, 25);
+		Vector3 EB_Dims = Vector3(25, holeSize, 725);
+
+		Vector3 posA(0, depth*3, 750);
+		Vector3 posB(0, depth*3,-750);
+		Vector3 posC(765, depth * 3, 0);
+		Vector3 posD(-765, depth * 3, 0);
+
+		AddObstacleToWorld(posA, EA_Dims, 0.0f);
+		AddObstacleToWorld(posB, EA_Dims, 0.0f);
+		AddObstacleToWorld(posC, EB_Dims, 0.0f);
+		AddObstacleToWorld(posD, EB_Dims, 0.0f);
+
+
+	//Ball
+		Vector3 ballPos(0, depth * 5, 0);
+		float radius = (20.0f);
+		AddSphereToWorld(ballPos,radius);
+	
+
+	//Floor
+	AddFloorToWorld(Vector3(10, -10, 1));
+}
+
 
 
 void TutorialGame::InitSphereCollisionTorqueTest() {
@@ -439,7 +583,7 @@ bool TutorialGame::SelectObject() {
 				
 			
 				selectionObject = (GameObject*)closestCollision.node;
-				selectionObject->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
+				selectionObject->GetRenderObject()->SetColour(Vector4(1, 0, 0, 1));
 				return true;
 			}
 			else {

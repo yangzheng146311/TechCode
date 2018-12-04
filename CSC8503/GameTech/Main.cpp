@@ -94,7 +94,7 @@ int main() {
 	if (!w->HasInitialised()) {
 		return -1;
 	}	
-	TestStateMachine();
+	//TestStateMachine();
 	//TestNetworking();
 	//TestPathfinding();
 	

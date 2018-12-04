@@ -26,8 +26,11 @@ namespace NCL {
 			test scenarios (constraints, collision types, and so on). 
 			*/
 			void InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius);
+			void InitGolfBall();
 			void InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing);
 			void InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims);
+			void InitTerrain(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims);
+			void InitQuadEdge();
 			void InitSphereCollisionTorqueTest();
 			void InitCubeCollisionTorqueTest();
 			void InitSphereAABBTest();
@@ -43,6 +46,8 @@ namespace NCL {
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
+			GameObject* AddTerrainToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
+			GameObject* AddObstacleToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
 
 			GameTechRenderer*	renderer;
 			PhysicsSystem*		physics;
@@ -57,7 +62,11 @@ namespace NCL {
 
 			OGLMesh*	cubeMesh	= nullptr;
 			OGLMesh*	sphereMesh	= nullptr;
+			OGLTexture* ballTex = nullptr;
 			OGLTexture* basicTex	= nullptr;
+			OGLTexture* terrainTex = nullptr;
+			OGLTexture* obsTex = nullptr;
+			OGLTexture* floorTex = nullptr;
 			OGLShader*	basicShader = nullptr;
 		};
 	}
