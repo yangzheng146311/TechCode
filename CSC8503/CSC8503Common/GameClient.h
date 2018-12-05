@@ -16,8 +16,9 @@ namespace NCL {
 
 			void SendPacket(GamePacket&  payload);
 
-		protected:
 			void UpdateClient();
+		protected:
+			
 			void ThreadedUpdate();
 
 			ENetPeer*	netPeer;

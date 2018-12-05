@@ -15,6 +15,7 @@ namespace NCL {
 			bool Initialise();
 			void Shutdown();
 
+			virtual void UpdateServer();
 			void SetGameWorld(GameWorld &g);
 
 			void ThreadedUpdate();
@@ -33,7 +34,7 @@ namespace NCL {
 
 			std::atomic<bool> threadAlive;
 
-			virtual void UpdateServer();
+			
 
 			std::thread updateThread;
 

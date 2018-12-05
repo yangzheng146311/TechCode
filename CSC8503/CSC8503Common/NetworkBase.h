@@ -2,6 +2,7 @@
 #include <enet/enet.h>
 #include <map>
 #include <string>
+#include<iostream>
 
 enum BasicNetworkMessages {
 	None,
@@ -71,7 +72,7 @@ struct PlayerDisconnectPacket : public GamePacket {
 
 class PacketReceiver {
 public:
-	virtual void ReceivePacket(int type, GamePacket* payload) = 0;
+	virtual void ReceivePacket(int type, GamePacket* payload, int source = -1) = 0;
 };
 
 class NetworkBase	{
@@ -91,6 +92,7 @@ protected:
 	NetworkBase();
 	~NetworkBase();
 
+	bool ProcessPacket(GamePacket* p, int peerID = -1);
 	typedef std::multimap<int, PacketReceiver*>::const_iterator PacketHandlerIterator;
 
 	bool GetPackethandlers(int msgID, PacketHandlerIterator& first, PacketHandlerIterator& last) const {
