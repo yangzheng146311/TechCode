@@ -387,7 +387,7 @@ void TutorialGame::InitCourt() {
 		float depth = holeSize;
 		float blockALong = 1000.0f;
 		int unit = (blockALong / holeSize);
-		int holePosUnit = 6;
+		int holePosUnit = 20;
 		float blockAWidth = (blockALong - holeSize) *0.5f;
 		float blockBLong = holeSize * holePosUnit;
 		float blockCLong = holeSize * (unit - holePosUnit - 1);
