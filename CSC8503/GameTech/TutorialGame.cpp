@@ -159,7 +159,7 @@ void TutorialGame::InitCamera() {
 	world->GetMainCamera()->SetFarPlane(4200.0f);
 	world->GetMainCamera()->SetPitch(-35.0f);
 	world->GetMainCamera()->SetYaw(320.0f);
-	world->GetMainCamera()->SetPosition(Vector3(-50, 120, 200));
+	world->GetMainCamera()->SetPosition(Vector3(-500, 1200, 2000));
 
 
 	//world->GetMainCamera()->SetNearPlane(3.0f);
@@ -175,10 +175,10 @@ void TutorialGame::InitWorld() {
 
 
 	//Tutorial Origin
-	InitCubeGridWorld(5, 5, 50.0f, 50.0f, Vector3(10, 10, 10));
+	//InitCubeGridWorld(5, 5, 50.0f, 50.0f, Vector3(10, 10, 10));
 
 	//Coursework One
-	//InitQuadEdge();
+	InitCourt();
 	
 	//InitSphereGridWorld(10, 10, 50.0f, 50.0f, 10.0f);
 
@@ -252,6 +252,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 	sphere->GetPhysicsObject()->InitSphereInertia();
 
 	world->AddGameObject(sphere);
+	
 
 	return sphere;
 }
@@ -378,7 +379,7 @@ void TutorialGame::InitTerrain(int numRows, int numCols, float rowSpacing, float
 }
 
 
-void TutorialGame::InitQuadEdge() {
+void TutorialGame::InitCourt() {
 
 	//Terrain
 	
@@ -427,7 +428,13 @@ void TutorialGame::InitQuadEdge() {
 	//Ball
 		Vector3 ballPos(0, depth * 5, 0);
 		float radius = (20.0f);
-		AddSphereToWorld(ballPos,radius);
+		world->SetPlayer(AddSphereToWorld(ballPos, radius,0.1f));
+
+		Vector3 playerPos = world->GetPlayer()->GetTransform().GetWorldPosition();
+		Vector3 newCamPos = Vector3(playerPos.x, playerPos.y+500, playerPos.z+500);
+		world->GetMainCamera()->SetPosition(newCamPos);
+
+		
 	
 
 	//Floor
@@ -574,7 +581,14 @@ bool TutorialGame::SelectObject() {
 		if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::MOUSE_LEFT)) {
 			if (selectionObject) {	//set colour to deselected;
 				selectionObject->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
+
 				selectionObject = nullptr;
+
+				
+
+				
+
+
 			}
 
 			Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
@@ -609,19 +623,77 @@ void TutorialGame::MoveSelectedObject() {
 	renderer->DrawString("Click Force:" + std::to_string(forceMagnitude), Vector2(10, 20));
 	forceMagnitude += Window::GetMouse()->GetWheelMovement() * 100.0f;
 
+	
+	Vector3 forceRayDir;
+	Vector3 playerPos = world->GetPlayer()->GetTransform().GetWorldPosition();
+	
+	
+	
+
 	if (!selectionObject) {
 		return;//we haven't selected anything!
 	}
 	//Push the selected object!
-	if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::MOUSE_RIGHT)) {
-		Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
-
-		RayCollision closestCollision;
-		if (world->Raycast(ray, closestCollision, true)) {
-			if (closestCollision.node == selectionObject) {
-				//selectionObject->GetPhysicsObject()-> AddForce(ray.GetDirection() * forceMagnitude);
-				selectionObject ->GetPhysicsObject()->AddForceAtPosition(  ray.GetDirection() * forceMagnitude ,  closestCollision.collidedAt); 
-			}
+	if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::MOUSE_LEFT))
+	{
+		Ray rayFromScreen = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
+		RayCollision closestCollisionFromScreen;
+		if (world->Raycast(rayFromScreen, closestCollisionFromScreen, true)) {
+			forcePos = closestCollisionFromScreen.collidedAt;
 		}
+	}
+
+
+	if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::MOUSE_RIGHT))
+	{
+		
+		
+		Ray rayToFloor = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
+		
+		RayCollision closestCollisionToFloor;
+		if (world->Raycast(rayToFloor, closestCollisionToFloor, true)) {
+			
+			Vector3 colliidedAt = closestCollisionToFloor.collidedAt;
+			axisYoffset = 0.0f;
+			dirPoint=Vector3(colliidedAt.x, colliidedAt.y + axisYoffset, colliidedAt.z);
+			Debug::DrawLine(forcePos,dirPoint, Vector4(1, 1, 1, 1));
+			Ray forceRay(dirPoint, forcePos-dirPoint);
+			forceRayDir = forceRay.GetDirection();
+		
+		}
+		
+	}
+	//world->GetPlayer()->GetPhysicsObject()->AddForceAtPosition(forceRayDir * forceMagnitude, playerPos);
+	
+    if (Window::GetKeyboard()->KeyPressed(KEYBOARD_P)) {
+	//world->GetPlayer()->GetPhysicsObject()->AddForce(-forceRayDir * forceMagnitude);
+		
+	world->GetPlayer()->GetPhysicsObject()->AddForceAtPosition(forceRayDir * forceMagnitude, playerPos);
+	}
+
+
+
+	
+
+
+
+	if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::MOUSE_RIGHT)) {
+
+		//
+		//Vector3 playerPos = world->GetPlayer()->GetTransform().GetWorldPosition();
+
+		//Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
+
+		//RayCollision closestCollision;
+
+
+
+
+		//if (world->Raycast(ray, closestCollision, true)) {
+		//	if (closestCollision.node == selectionObject) {
+		//		//selectionObject->GetPhysicsObject()-> AddForce(ray.GetDirection() * forceMagnitude);
+		//		selectionObject ->GetPhysicsObject()->AddForceAtPosition(  ray.GetDirection() * forceMagnitude ,  closestCollision.collidedAt); 
+		//	}
+		//}
 	}
 }

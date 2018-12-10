@@ -26,6 +26,8 @@ namespace NCL {
 			void BroadcastSnapshot(bool deltaFrame);
 			void UpdateMinimumState();
 
+			
+
 		protected:
 			int			port;
 			int			clientMax;

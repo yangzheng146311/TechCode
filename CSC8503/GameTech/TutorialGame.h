@@ -11,6 +11,13 @@ namespace NCL {
 			~TutorialGame();
 
 			virtual void UpdateGame(float dt);
+			
+			
+
+			
+
+
+
 
 		protected:
 			void InitialiseAssets();
@@ -30,7 +37,7 @@ namespace NCL {
 			void InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing);
 			void InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims);
 			void InitTerrain(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims);
-			void InitQuadEdge();
+			void InitCourt();
 			void InitSphereCollisionTorqueTest();
 			void InitCubeCollisionTorqueTest();
 			void InitSphereAABBTest();
@@ -53,6 +60,9 @@ namespace NCL {
 			PhysicsSystem*		physics;
 			GameWorld*			world;
 
+			Vector3 forcePos;
+			Vector3 dirPoint;
+			float axisYoffset;
 			bool useGravity;
 			bool inSelectionMode;
 

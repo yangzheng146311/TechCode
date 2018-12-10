@@ -28,6 +28,16 @@ namespace NCL {
 				return mainCamera;
 			}
 
+			GameObject* GetPlayer() const {
+				return playerObj;
+			}
+
+			void SetPlayer(GameObject* player)
+			{
+				playerObj = player;
+
+			}
+
 			void ShuffleConstraints(bool state) {
 				shuffleConstraints = state;
 			}
@@ -59,6 +69,8 @@ namespace NCL {
 			QuadTree<GameObject*>* quadTree;
 
 			Camera* mainCamera;
+
+			GameObject* playerObj;
 
 			bool shuffleConstraints;
 			bool shuffleObjects;

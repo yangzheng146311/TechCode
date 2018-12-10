@@ -47,8 +47,10 @@ namespace NCL {
 				return false;
 			}
 		};
-
+		
 		static Ray BuildRayFromMouse(const Camera& c);
+
+		static Ray BuildRayFromBall(const Vector3 ballPos,const Vector3 floorHitPos);
 
 		static bool RayIntersection(const Ray&r, GameObject& object, RayCollision &collisions);
 

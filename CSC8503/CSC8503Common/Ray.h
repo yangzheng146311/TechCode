@@ -33,6 +33,14 @@ namespace NCL {
 
 			Vector3 GetDirection() const {return direction;	}
 
+			Ray GetReverseRay() const{
+				float x = -direction.x;
+			    float y = -direction.y;
+			    float z = -direction.z;
+				Vector3 reDir(x, y, z);
+				return Ray(position, reDir);
+			}
+
 		protected:
 			Vector3 position;	//World space position
 			Vector3 direction;	//Normalised world space direction

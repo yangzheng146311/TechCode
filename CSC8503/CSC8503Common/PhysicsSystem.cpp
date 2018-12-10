@@ -18,8 +18,8 @@ These two variables help define the relationship between positions
 and the forces that are added to objects to change those positions
 
 */
-//const float PhysicsSystem::UNIT_MULTIPLIER = 100.0f;
-const float PhysicsSystem::UNIT_MULTIPLIER =1.0f;
+const float PhysicsSystem::UNIT_MULTIPLIER = 100.0f;
+//const float PhysicsSystem::UNIT_MULTIPLIER =1.0f;
 const float PhysicsSystem::UNIT_RECIPROCAL = 1.0f / UNIT_MULTIPLIER;
 //const float PhysicsSystem::UNIT_RECIPROCAL = 1.0f;
 
@@ -195,7 +195,7 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 	float angularEffect= Vector3::Dot(inertiaA + inertiaB , p.normal); 
 
 	//float cRestitution = 0.66f; //disperse some kinectic energy
-	physB->SetElasticity(1.5f);
+	physB->SetElasticity(0.8f);
 	float cRestitution = 0.66f*physB->GetElasticity(); //disperse some kinectic energy
 
 	float j = ( -(1.0f + cRestitution) * impulseForce) /  (totalMass + angularEffect); 

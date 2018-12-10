@@ -10,6 +10,8 @@ using namespace NCL::CSC8503;
 GameWorld::GameWorld()	{
 	mainCamera = new Camera();
 
+	playerObj = nullptr;
+
 	quadTree = nullptr;
 
 	shuffleConstraints	= false;
