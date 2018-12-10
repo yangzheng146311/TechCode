@@ -175,10 +175,10 @@ void TutorialGame::InitWorld() {
 
 
 	//Tutorial Origin
-	//InitCubeGridWorld(5, 5, 50.0f, 50.0f, Vector3(10, 10, 10));
+	InitCubeGridWorld(5, 5, 50.0f, 50.0f, Vector3(10, 10, 10));
 
 	//Coursework One
-	InitQuadEdge();
+	//InitQuadEdge();
 	
 	//InitSphereGridWorld(10, 10, 50.0f, 50.0f, 10.0f);
 
