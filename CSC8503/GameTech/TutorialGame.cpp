@@ -387,7 +387,7 @@ void TutorialGame::InitCourt() {
 		float depth = holeSize;
 		float blockALong = 1000.0f;
 		int unit = (blockALong / holeSize);
-		int holePosUnit = 20;
+		int holePosUnit = 10;
 		float blockAWidth = (blockALong - holeSize) *0.5f;
 		float blockBLong = holeSize * holePosUnit;
 		float blockCLong = holeSize * (unit - holePosUnit - 1);
@@ -584,10 +584,6 @@ bool TutorialGame::SelectObject() {
 
 				selectionObject = nullptr;
 
-				
-
-				
-
 
 			}
 
@@ -663,7 +659,7 @@ void TutorialGame::MoveSelectedObject() {
 		}
 		
 	}
-	//world->GetPlayer()->GetPhysicsObject()->AddForceAtPosition(forceRayDir * forceMagnitude, playerPos);
+
 	
     if (Window::GetKeyboard()->KeyPressed(KEYBOARD_P)) {
 	//world->GetPlayer()->GetPhysicsObject()->AddForce(-forceRayDir * forceMagnitude);
