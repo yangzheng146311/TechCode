@@ -175,10 +175,10 @@ void TutorialGame::InitWorld() {
 
 
 	//Tutorial Origin
-	InitCubeGridWorld(5, 5, 50.0f, 50.0f, Vector3(10, 10, 10));
+	//InitCubeGridWorld(5, 5, 50.0f, 50.0f, Vector3(10, 10, 10));
 
 	//Coursework One
-	//InitQuadEdge();
+	InitQuadEdge();
 	
 	//InitSphereGridWorld(10, 10, 50.0f, 50.0f, 10.0f);
 
@@ -386,7 +386,7 @@ void TutorialGame::InitQuadEdge() {
 		float depth = holeSize;
 		float blockALong = 1000.0f;
 		int unit = (blockALong / holeSize);
-		int holePosUnit = 6;
+		int holePosUnit = 20;
 		float blockAWidth = (blockALong - holeSize) *0.5f;
 		float blockBLong = holeSize * holePosUnit;
 		float blockCLong = holeSize * (unit - holePosUnit - 1);
