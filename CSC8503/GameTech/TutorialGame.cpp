@@ -647,7 +647,7 @@ void TutorialGame::MoveSelectedObject() {
 	if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::MOUSE_RIGHT))
 	{
 		
-		
+		//
 		Ray rayToFloor = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
 		
 		RayCollision closestCollisionToFloor;
