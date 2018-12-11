@@ -85,8 +85,8 @@ void TutorialGame::UpdateGame(float dt) {
 	else {
 		Debug::Print("(G)ravity off", Vector2(10, 40));
 	}
-	//world->GetObsFan()->GetPhysicsObject()->SetInverseMass(1.0f);
-	//world->GetObsFan()->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0.5f, 0));
+	world->GetObsFan()->GetPhysicsObject()->SetInverseMass(1.0f);
+	world->GetObsFan()->GetPhysicsObject()->SetLinearVelocity(Vector3(100.0f, 0.0f, 0.0f));
 
 
 	SelectObject();
