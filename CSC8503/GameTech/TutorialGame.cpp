@@ -81,6 +81,9 @@ void TutorialGame::UpdateGame(float dt) {
 	else {
 		Debug::Print("(G)ravity off", Vector2(10, 40));
 	}
+	//world->GetObsFan()->GetPhysicsObject()->SetInverseMass(1.0f);
+	world->GetObsFan()->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0.5f, 0));
+
 
 	SelectObject();
 	MoveSelectedObject();
@@ -94,7 +97,11 @@ void TutorialGame::UpdateGame(float dt) {
 }
 
 void TutorialGame::UpdateKeys() {
-	if (Window::GetKeyboard()->KeyPressed(KEYBOARD_F1)) {
+
+
+	
+
+	if (Window::GetKeyboard()->KeyPressed(KEYBOARD_R)) {
 		InitWorld(); //We can reset the simulation at any time with F1
 		selectionObject = nullptr;
 	}
@@ -120,8 +127,8 @@ void TutorialGame::UpdateKeys() {
 
 	if (Window::GetKeyboard()->KeyPressed(KEYBOARD_F7)) {
 		world->ShuffleObjects(true);
-	}
-	if (Window::GetKeyboard()->KeyPressed(KEYBOARD_F8)) {
+	}	if (Window::GetKeyboard()->KeyPressed(KEYBOARD_F8)) {
+
 		world->ShuffleObjects(false);
 	}
 	//If we've selected an object, we can manipulate it with some key presses
@@ -410,25 +417,49 @@ void TutorialGame::InitCourt() {
 
 	//Edge
 	
-		
-		Vector3 EA_Dims = Vector3(790, holeSize, 25);
-		Vector3 EB_Dims = Vector3(25, holeSize, 725);
+		Vector3 EA_Dims = Vector3(1000, holeSize*3, 25);
+		Vector3 EB_Dims = Vector3(25, holeSize*3, 950);
 
-		Vector3 posA(0, depth*3, 750);
-		Vector3 posB(0, depth*3,-750);
-		Vector3 posC(765, depth * 3, 0);
-		Vector3 posD(-765, depth * 3, 0);
+		Vector3 posA(0, depth*5, 975);
+		Vector3 posB(0, depth*5,-975);
+		Vector3 posC(975, depth * 5, 0);
+		Vector3 posD(-975, depth * 5, 0);
 
 		AddObstacleToWorld(posA, EA_Dims, 0.0f);
 		AddObstacleToWorld(posB, EA_Dims, 0.0f);
 		AddObstacleToWorld(posC, EB_Dims, 0.0f);
 		AddObstacleToWorld(posD, EB_Dims, 0.0f);
 
+	//Obstacle
+		Vector3 OBS_LeftRight = Vector3(675, holeSize * 3, 25);
+		Vector3 OBS_Top = Vector3(25, holeSize * 3, 675);
+		Vector3 OBS_Door = Vector3(25, holeSize * 3, 200);
+		Vector3 OBS_Fan = Vector3(25, holeSize * 3, 400);
+
+
+		Vector3 posR(0, depth * 5, 650);
+		Vector3 posL(0, depth * 5, -650);
+		Vector3 posT(700, depth * 5, 0);
+		Vector3 posRdoor(400, depth * 5, -300);
+		Vector3 posLdoor(400, depth * 5, 300);
+		Vector3 posFan(-400, depth * 5, 0);
+		
+
+		AddObstacleToWorld(posR, OBS_LeftRight, 0.0f);
+		AddObstacleToWorld(posL, OBS_LeftRight, 0.0f);
+		AddObstacleToWorld(posT, OBS_Top, 0.0f);
+		AddObstacleToWorld(posRdoor, OBS_Door, 0.0f);
+		AddObstacleToWorld(posLdoor, OBS_Door, 0.0f);
+		world->SetObsFan(AddObstacleToWorld(posFan, OBS_Fan,0.0f));
+
+
+
+
 
 	//Ball
-		Vector3 ballPos(0, depth * 5, 0);
+		Vector3 ballPos(-100, depth * 5, 0);
 		float radius = (20.0f);
-		world->SetPlayer(AddSphereToWorld(ballPos, radius,0.1f));
+		world->SetPlayer(AddSphereToWorld(ballPos, radius,1.0f));
 
 		Vector3 playerPos = world->GetPlayer()->GetTransform().GetWorldPosition();
 		Vector3 newCamPos = Vector3(playerPos.x, playerPos.y+500, playerPos.z+500);
@@ -581,10 +612,7 @@ bool TutorialGame::SelectObject() {
 		if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::MOUSE_LEFT)) {
 			if (selectionObject) {	//set colour to deselected;
 				selectionObject->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
-
 				selectionObject = nullptr;
-
-
 			}
 
 			Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
@@ -617,10 +645,12 @@ line - after the third, they'll be able to twist under torque aswell.
 
 void TutorialGame::MoveSelectedObject() {
 	renderer->DrawString("Click Force:" + std::to_string(forceMagnitude), Vector2(10, 20));
-	forceMagnitude += Window::GetMouse()->GetWheelMovement() * 100.0f;
+	forceMagnitude += Window::GetMouse()->GetWheelMovement() * 10.0f;
 
 	
 	Vector3 forceRayDir;
+	Vector3 playerPos(0, 0, 0);
+	if(world->GetPlayer()!=NULL)
 	Vector3 playerPos = world->GetPlayer()->GetTransform().GetWorldPosition();
 	
 	

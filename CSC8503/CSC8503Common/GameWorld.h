@@ -38,6 +38,17 @@ namespace NCL {
 
 			}
 
+			GameObject* GetObsFan() const {
+				return obsFan;
+			}
+
+			void SetObsFan(GameObject* fan)
+			{
+				obsFan = fan;
+
+			}
+
+
 			void ShuffleConstraints(bool state) {
 				shuffleConstraints = state;
 			}
@@ -70,7 +81,11 @@ namespace NCL {
 
 			Camera* mainCamera;
 
-			GameObject* playerObj;
+			GameObject* playerObj=NULL;
+
+			GameObject* obsFan = NULL;
+
+
 
 			bool shuffleConstraints;
 			bool shuffleObjects;
