@@ -1,10 +1,12 @@
 #include "PhysicsSystem.h"
 #include "PhysicsObject.h"
 #include "GameObject.h"
+
 #include "CollisionDetection.h"
 #include "../../Common/Quaternion.h"
 
 #include "Constraint.h"
+//#include"../GameTech/TutorialGame.h"
 
 #include "Debug.h"
 
@@ -50,6 +52,7 @@ any collisions they are in.
 */
 void PhysicsSystem::Clear() {
 	allCollisions.clear();
+	
 }
 
 /*
@@ -146,10 +149,18 @@ void PhysicsSystem::BasicCollisionDetection() {
 			} 
 			CollisionDetection::CollisionInfo info; 
 			if (CollisionDetection::ObjectIntersection(*i, *j, info)) { 
-				std::cout << "Collision between " << (*i)->GetName() << " and " << (*j)->GetName() << std::endl; 
+				//std::cout << "Collision between " << (*i)->GetName() << " and " << (*j)->GetName() << std::endl; 
 				ImpulseResolveCollision(*info.a, *info.b, info.point);
 				info.framesLeft = numCollisionFrames; 
 				allCollisions.insert(info); 
+
+				if ((*j)->GetName() == "floor" && (*i)->GetName() == "player")
+				{
+
+					std::cout << "next level" << std::endl;
+					isTouchFloor = true;
+				}
+
 			} 
 		} 
 	}

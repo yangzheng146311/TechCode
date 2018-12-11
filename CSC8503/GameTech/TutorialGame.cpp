@@ -10,14 +10,18 @@
 using namespace NCL;
 using namespace CSC8503;
 
+
 TutorialGame::TutorialGame()	{
 	world		= new GameWorld();
 	renderer	= new GameTechRenderer(*world);
 	physics		= new PhysicsSystem(*world);
+	myLevel = 1;
 
 	forceMagnitude	= 10.0f;
 	useGravity		= false;
 	inSelectionMode = false;
+
+	
 
 	Debug::SetRenderer(renderer);
 
@@ -82,7 +86,7 @@ void TutorialGame::UpdateGame(float dt) {
 		Debug::Print("(G)ravity off", Vector2(10, 40));
 	}
 	//world->GetObsFan()->GetPhysicsObject()->SetInverseMass(1.0f);
-	world->GetObsFan()->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0.5f, 0));
+	//world->GetObsFan()->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0.5f, 0));
 
 
 	SelectObject();
@@ -92,18 +96,24 @@ void TutorialGame::UpdateGame(float dt) {
 	renderer->Update(dt);
 	physics->Update(dt);
 
+
+	if (physics->isTouchFloor == true) {
+		myLevel = 2; 
+		physics->isTouchFloor = false;
+	}
+
 	Debug::FlushRenderables();
 	renderer->Render();
 }
 
 void TutorialGame::UpdateKeys() {
 
-
 	
 
-	if (Window::GetKeyboard()->KeyPressed(KEYBOARD_R)) {
+	if (Window::GetKeyboard()->KeyPressed(KEYBOARD_R)|| myLevel == 2) {
 		InitWorld(); //We can reset the simulation at any time with F1
 		selectionObject = nullptr;
+		myLevel = 1;
 	}
 
 	if (Window::GetKeyboard()->KeyPressed(KEYBOARD_F2)) {
@@ -180,7 +190,7 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-
+	
 	//Tutorial Origin
 	//InitCubeGridWorld(5, 5, 50.0f, 50.0f, Vector3(10, 10, 10));
 
@@ -230,6 +240,8 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 
 	floor->GetPhysicsObject()->SetInverseMass(0);
 	floor->GetPhysicsObject()->InitCubeInertia();
+
+	floor->SetName("floor");
 
 	world->AddGameObject(floor);
 
@@ -301,6 +313,9 @@ GameObject* TutorialGame::AddTerrainToWorld(const Vector3& position, Vector3 dim
 	cube->GetPhysicsObject()->SetInverseMass(inverseMass);
 	cube->GetPhysicsObject()->InitCubeInertia();
 
+	
+	cube->SetName("terrain");
+
 	world->AddGameObject(cube);
 
 	return cube;
@@ -322,6 +337,8 @@ GameObject * NCL::CSC8503::TutorialGame::AddObstacleToWorld(const Vector3 & posi
 
 	cube->GetPhysicsObject()->SetInverseMass(inverseMass);
 	cube->GetPhysicsObject()->InitCubeInertia();
+
+	cube->SetName("wall");
 
 	world->AddGameObject(cube);
 
@@ -459,7 +476,8 @@ void TutorialGame::InitCourt() {
 	//Ball
 		Vector3 ballPos(-100, depth * 5, 0);
 		float radius = (20.0f);
-		world->SetPlayer(AddSphereToWorld(ballPos, radius,1.0f));
+		world->SetPlayer(AddSphereToWorld(ballPos, radius,0.05f));
+		world->GetPlayer()->SetName("player");
 
 		Vector3 playerPos = world->GetPlayer()->GetTransform().GetWorldPosition();
 		Vector3 newCamPos = Vector3(playerPos.x, playerPos.y+500, playerPos.z+500);

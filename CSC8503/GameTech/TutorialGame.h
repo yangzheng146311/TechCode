@@ -11,14 +11,9 @@ namespace NCL {
 			~TutorialGame();
 
 			virtual void UpdateGame(float dt);
+
+			int myLevel;
 			
-			
-
-			
-
-
-
-
 		protected:
 			void InitialiseAssets();
 

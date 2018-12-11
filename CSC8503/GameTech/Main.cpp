@@ -133,9 +133,12 @@ This time, we've added some extra functionality to the window class - we can
 hide or show the 
 
 */
+
+
+
 int main() {
 	Window*w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720);
-
+	
 	if (!w->HasInitialised()) {
 		return -1;
 	}	

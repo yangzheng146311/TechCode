@@ -25,6 +25,7 @@ namespace NCL {
 
 			static const float UNIT_MULTIPLIER;
 			static const float UNIT_RECIPROCAL;
+			bool isTouchFloor = false;
 
 		protected:
 			void BasicCollisionDetection();
@@ -48,6 +49,9 @@ namespace NCL {
 			Vector3 gravity;
 			float	dTOffset;
 			float	globalDamping;
+
+			
+			
 
 			std::set<CollisionDetection::CollisionInfo> allCollisions;
 			std::set<CollisionDetection::CollisionInfo> broadphaseCollisions;
