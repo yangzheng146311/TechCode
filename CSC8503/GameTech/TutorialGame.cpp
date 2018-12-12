@@ -18,6 +18,7 @@ TutorialGame::TutorialGame()	{
 	testMachine = new StateMachine();
 	myLevel = 1;
 
+	int rand_int = 0;
 	forceMagnitude	= 10.0f;
 	useGravity		= false;
 	inSelectionMode = false;
@@ -56,6 +57,8 @@ void TutorialGame::InitialiseAssets() {
 
 	InitCamera();
 	InitWorld();
+
+	//srand((unsigned)time(NULL));
 }
 
 TutorialGame::~TutorialGame()	{
@@ -85,7 +88,7 @@ void TutorialGame::UpdateGame(float dt) {
 	if (useGravity) {
 		Debug::Print("(G)ravity on", Vector2(10, 40));
 	}
-	else {
+	 {
 		Debug::Print("(G)ravity off", Vector2(10, 40));
 	}
 	 
@@ -94,13 +97,13 @@ void TutorialGame::UpdateGame(float dt) {
 
 	
 
-	if (physics->getGravityState())
+	if (physics->getGravityState()&& world->myTimer>3)
 	{
 		Enemy_Chase(world->GetEnemy(), world->GetPlayer());
 		
 	}
 	CamFollow(world->GetMainCamera(), world->GetPlayer());
-	FSM_MoveWall(time, world);
+	FSM_MoveWall(mytime, world);
 	SelectObject();
 	MoveSelectedObject();
 	world->UpdateWorld(dt);
@@ -120,11 +123,12 @@ void TutorialGame::UpdateGame(float dt) {
 void TutorialGame::UpdateKeys() {
 
 	
-
+	
 	if (Window::GetKeyboard()->KeyPressed(KEYBOARD_R)|| myLevel == 2) {
 		InitWorld(); //We can reset the simulation at any time with F1
 		selectionObject = nullptr;
 		myLevel = 1;
+		world->myTimer = 0;
 	}
 
 	if (Window::GetKeyboard()->KeyPressed(KEYBOARD_F2)) {
@@ -180,6 +184,8 @@ void TutorialGame::UpdateKeys() {
 			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, 100));
 		}
 	}
+
+	
 }
 
 void TutorialGame::InitCamera() {
@@ -701,9 +707,47 @@ void NCL::CSC8503::TutorialGame::Enemy_Chase(GameObject * enemy, GameObject * pl
 	Vector3 ePos = enemy->GetTransform().GetWorldPosition();
 	Vector3 pPos = player->GetTransform().GetWorldPosition();
 	Vector3 eVdir = pPos - ePos;
+	Vector3 eVdirN = eVdir.Normalised();
 
-	enemy->GetPhysicsObject()->AddForce(eVdir);
-	//enemy->GetPhysicsObject()->SetLinearVelocity(eVdir*5.0f);
+	if((int)world->myTimer%1==0)
+	{
+		rand_int_x = 0+ rand() % 360;
+		//rand_int_z = -1 + rand() % 2;
+	}
+
+	//if ((int)world->myTimer % 2 == 0)
+	//{
+	//	rand_int_z = -100 + rand() % 200;
+	//	//rand_int_z = -1 + rand() % 2;
+	//}
+
+
+	//std::cout << rand_int << std::endl;
+	//std::cout << (int)world->myTimer << std::endl;
+
+	if (eVdir.Length() < 400.0f) {
+
+		enemy->GetPhysicsObject()->AddForceAtPosition(eVdirN*5.0f,ePos);
+	}
+
+	
+	
+
+
+	else
+	{
+		
+			
+			//std::cout << rand_int_x << std::endl;
+			Vector3 surroundPoint(Vector3(ePos.x + cos(rand_int_x), ePos.y, ePos.z + sin(rand_int_x)));
+			Vector3 patrollDir = surroundPoint - ePos;
+			Vector3 normal = patrollDir.Normalised();
+			enemy->GetPhysicsObject()->AddForceAtPosition(normal*100.0f,ePos);
+			
+		
+
+		//enemy->GetPhysicsObject()->SetLinearVelocity(eVdir*5.0f);
+	}
 }
 
 /*

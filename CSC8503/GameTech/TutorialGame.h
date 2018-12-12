@@ -14,9 +14,12 @@ namespace NCL {
 
 			virtual void UpdateGame(float dt);
 
+			int stack = 1;
 			int myLevel;
-			int time=1;
+			int mytime=1;
 			int wallMoveDir = 1;
+			int rand_int_x = 0;
+			int rand_int_z = 0;
 			StateMachine *testMachine;
 		protected:
 			void InitialiseAssets();

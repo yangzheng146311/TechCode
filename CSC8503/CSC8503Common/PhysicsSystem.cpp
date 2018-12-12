@@ -167,6 +167,7 @@ void PhysicsSystem::BasicCollisionDetection() {
 					//std::cout << "GG" << std::endl;
 					(*i)->GetTransform().SetWorldPosition(Vector3(0, 500,0));
 					(*j)->GetTransform().SetWorldPosition(Vector3(-500, 500, 0));
+					
 				}
 
 
