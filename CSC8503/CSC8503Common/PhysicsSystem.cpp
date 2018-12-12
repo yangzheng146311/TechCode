@@ -157,9 +157,18 @@ void PhysicsSystem::BasicCollisionDetection() {
 				if ((*j)->GetName() == "floor" && (*i)->GetName() == "player")
 				{
 
-					std::cout << "next level" << std::endl;
+					//std::cout << "next level" << std::endl;
 					isTouchFloor = true;
 				}
+
+				if ((*j)->GetName() == "enemy" && (*i)->GetName() == "player")
+				{
+
+					//std::cout << "GG" << std::endl;
+					(*i)->GetTransform().SetWorldPosition(Vector3(0, 500,0));
+					(*j)->GetTransform().SetWorldPosition(Vector3(-500, 500, 0));
+				}
+
 
 			} 
 		} 

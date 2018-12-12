@@ -23,6 +23,12 @@ namespace NCL {
 
 			void SetGravity(const Vector3& g);
 
+			const bool getGravityState() {
+				
+				return applyGravity;
+
+			}
+
 			static const float UNIT_MULTIPLIER;
 			static const float UNIT_RECIPROCAL;
 			bool isTouchFloor = false;

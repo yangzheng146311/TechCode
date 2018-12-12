@@ -15,6 +15,7 @@ TutorialGame::TutorialGame()	{
 	world		= new GameWorld();
 	renderer	= new GameTechRenderer(*world);
 	physics		= new PhysicsSystem(*world);
+	testMachine = new StateMachine();
 	myLevel = 1;
 
 	forceMagnitude	= 10.0f;
@@ -46,6 +47,7 @@ void TutorialGame::InitialiseAssets() {
 
 	ballTex = (OGLTexture*)TextureLoader::LoadAPITexture("golfball.jpg");
 	basicTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
+	enemyTex = (OGLTexture*)TextureLoader::LoadAPITexture("doge.png");
 	terrainTex = (OGLTexture*)TextureLoader::LoadAPITexture("Green.png");
 	//floorTex = (OGLTexture*)TextureLoader::LoadAPITexture("grass.bmp");
 	floorTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
@@ -66,7 +68,7 @@ TutorialGame::~TutorialGame()	{
 	delete ballTex;
 	delete basicShader;
 	
-
+	delete testMachine;
 	delete physics;
 	delete renderer;
 	delete world;
@@ -79,19 +81,28 @@ void TutorialGame::UpdateGame(float dt) {
 
 	UpdateKeys();
 
+
 	if (useGravity) {
 		Debug::Print("(G)ravity on", Vector2(10, 40));
 	}
 	else {
 		Debug::Print("(G)ravity off", Vector2(10, 40));
 	}
-	world->GetObsFan()->GetPhysicsObject()->SetInverseMass(1.0f);
-	world->GetObsFan()->GetPhysicsObject()->SetLinearVelocity(Vector3(100.0f, 0.0f, 0.0f));
+	 
 
+	world->myTimer += dt;
 
+	
+
+	if (physics->getGravityState())
+	{
+		Enemy_Chase(world->GetEnemy(), world->GetPlayer());
+		
+	}
+	CamFollow(world->GetMainCamera(), world->GetPlayer());
+	FSM_MoveWall(time, world);
 	SelectObject();
 	MoveSelectedObject();
-
 	world->UpdateWorld(dt);
 	renderer->Update(dt);
 	physics->Update(dt);
@@ -189,13 +200,13 @@ void TutorialGame::InitCamera() {
 void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
-
+	//Coursework One
+	InitCourt();
 	
 	//Tutorial Origin
 	//InitCubeGridWorld(5, 5, 50.0f, 50.0f, Vector3(10, 10, 10));
 
-	//Coursework One
-	InitCourt();
+	
 	
 	//InitSphereGridWorld(10, 10, 50.0f, 50.0f, 10.0f);
 
@@ -297,6 +308,30 @@ GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimens
 	return cube;
 }
 
+GameObject * NCL::CSC8503::TutorialGame::AddEnemyToWorld(const Vector3 & position, float radius, float inverseMass)
+{
+	GameObject* sphere = new GameObject();
+
+	Vector3 sphereSize = Vector3(radius, radius, radius);
+	SphereVolume* volume = new SphereVolume(radius);
+	sphere->SetBoundingVolume((CollisionVolume*)volume);
+	sphere->GetTransform().SetWorldScale(sphereSize);
+	sphere->GetTransform().SetWorldPosition(position);
+
+	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, enemyTex, basicShader));
+	sphere->SetPhysicsObject(new PhysicsObject(&sphere->GetTransform(), sphere->GetBoundingVolume()));
+
+	sphere->GetPhysicsObject()->SetInverseMass(inverseMass);
+	sphere->GetPhysicsObject()->InitSphereInertia();
+
+	sphere->SetName("enemy");
+	world->SetEnemy(sphere);
+	world->AddGameObject(sphere);
+
+
+	return sphere;
+}
+
 GameObject* TutorialGame::AddTerrainToWorld(const Vector3& position, Vector3 dimensions, float inverseMass) {
 	GameObject* cube = new GameObject();
 
@@ -345,8 +380,6 @@ GameObject * NCL::CSC8503::TutorialGame::AddObstacleToWorld(const Vector3 & posi
 	return cube;
 }
 
-
-
 void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius) {
 	for (int x = 0; x < numCols; ++x) {
 		for (int z = 0; z < numRows; ++z) {
@@ -356,10 +389,6 @@ void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacin
 	}
 }
 
-void NCL::CSC8503::TutorialGame::InitGolfBall()
-{
-	
-}
 
 void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing) {
 	float sphereRadius = 10.0f;
@@ -450,8 +479,8 @@ void TutorialGame::InitCourt() {
 	//Obstacle
 		Vector3 OBS_LeftRight = Vector3(675, holeSize * 3, 25);
 		Vector3 OBS_Top = Vector3(25, holeSize * 3, 675);
-		Vector3 OBS_Door = Vector3(25, holeSize * 3, 200);
-		Vector3 OBS_Fan = Vector3(25, holeSize * 3, 400);
+		//Vector3 OBS_Door = Vector3(25, holeSize * 3, 200);
+		Vector3 OBS_MoveWall = Vector3(25, holeSize * 3, 400);
 
 
 		Vector3 posR(0, depth * 5, 650);
@@ -459,21 +488,23 @@ void TutorialGame::InitCourt() {
 		Vector3 posT(700, depth * 5, 0);
 		Vector3 posRdoor(400, depth * 5, -300);
 		Vector3 posLdoor(400, depth * 5, 300);
-		Vector3 posFan(-400, depth * 5, 0);
+		Vector3 posMoveWall_A(-400, depth * 5, 0);
+		Vector3 posMoveWall_B(200, depth * 5, 0);
 		
 
 		AddObstacleToWorld(posR, OBS_LeftRight, 0.0f);
 		AddObstacleToWorld(posL, OBS_LeftRight, 0.0f);
 		AddObstacleToWorld(posT, OBS_Top, 0.0f);
-		AddObstacleToWorld(posRdoor, OBS_Door, 0.0f);
-		AddObstacleToWorld(posLdoor, OBS_Door, 0.0f);
-		world->SetObsFan(AddObstacleToWorld(posFan, OBS_Fan,0.0f));
+		//AddObstacleToWorld(posRdoor, OBS_Door, 0.0f);
+		//AddObstacleToWorld(posLdoor, OBS_Door, 0.0f);
+		world->SetObsMoveWall(AddObstacleToWorld(posMoveWall_A, OBS_MoveWall,0.0f),0);
+		world->SetObsMoveWall(AddObstacleToWorld(posMoveWall_B, OBS_MoveWall, 0.0f), 1);
 
 
 
 
 
-	//Ball
+	//PlayerBall
 		Vector3 ballPos(-100, depth * 5, 0);
 		float radius = (20.0f);
 		world->SetPlayer(AddSphereToWorld(ballPos, radius,0.05f));
@@ -483,11 +514,19 @@ void TutorialGame::InitCourt() {
 		Vector3 newCamPos = Vector3(playerPos.x, playerPos.y+500, playerPos.z+500);
 		world->GetMainCamera()->SetPosition(newCamPos);
 
+	//EnemyCube
+		Vector3 ePos(0, depth * 5, 0);
+		float eRadius = 20.0f;
+		world->SetEnemy(AddEnemyToWorld(ePos, eRadius, 1.05f));
 		
+		
+
 	
 
 	//Floor
 	AddFloorToWorld(Vector3(10, -10, 1));
+
+
 }
 
 
@@ -604,6 +643,69 @@ void TutorialGame::SimpleAABBTest2() {
 	GameObject* fallingCube = AddCubeToWorld(Vector3(8, 20, 0), dimensions, 10.0f);
 }
 
+void NCL::CSC8503::TutorialGame::CamFollow(Camera * c, GameObject * obj)
+{
+	Vector3 playerPos = obj->GetTransform().GetWorldPosition();
+	Vector3 newCamPos = Vector3(playerPos.x, playerPos.y + 500, playerPos.z + 500);
+	c->SetPosition(newCamPos);
+}
+
+void NCL::CSC8503::TutorialGame::FSM_MoveWall(int  &time, GameWorld * g)
+{
+
+	StateFunc AFunc = [](void * data) {
+		int* realData = (int *)data;
+		(*realData)++;
+		//std::cout << "In State A!" << std::endl;
+		//std::cout << *realData << std::endl;
+
+	};
+	StateFunc BFunc = [](void * data) {
+		int * realData = (int *)data;
+		(*realData)--;
+		//std::cout << "In State B!" << std::endl;
+		//std::cout << *realData << std::endl;
+
+
+	};
+
+	GenericState * stateA = new GenericState(AFunc, (void *)&time);
+	GenericState * stateB = new GenericState(BFunc, (void *)&time);
+	testMachine->AddState(stateA);
+	testMachine->AddState(stateB);
+
+	GenericTransition <int &, int >* transitionA =
+		new GenericTransition <int &, int >(
+			GenericTransition <int &, int >::GreaterThanTransition, time, 100, stateA, stateB); // if greater than 100 A to B
+
+	GenericTransition <int &, int >* transitionB =
+		new GenericTransition <int &, int >(
+			GenericTransition <int &, int >::EqualsTransition, time, 0, stateB, stateA); // if equals 0, B to A
+
+	testMachine->AddTransition(transitionA);
+	testMachine->AddTransition(transitionB);
+
+	testMachine->Update(); // run the state machine !
+
+	if (time == 0 || time == 101) wallMoveDir *= -1;
+
+	g->GetMoveWall(0)->GetPhysicsObject()->SetLinearVelocity(Vector3(0.0f, 0.0f, wallMoveDir*80.0f));
+	g->GetMoveWall(1)->GetPhysicsObject()->SetLinearVelocity(Vector3(0.0f, 0.0f, -wallMoveDir * 80.0f));
+}
+
+void NCL::CSC8503::TutorialGame::Enemy_Chase(GameObject * enemy, GameObject * player)
+{
+	
+	
+
+	Vector3 ePos = enemy->GetTransform().GetWorldPosition();
+	Vector3 pPos = player->GetTransform().GetWorldPosition();
+	Vector3 eVdir = pPos - ePos;
+
+	enemy->GetPhysicsObject()->AddForce(eVdir);
+	//enemy->GetPhysicsObject()->SetLinearVelocity(eVdir*5.0f);
+}
+
 /*
 
 Every frame, this code will let you perform a raycast, to see if there's an object
@@ -638,8 +740,15 @@ bool TutorialGame::SelectObject() {
 			RayCollision closestCollision;
 			if (world->Raycast(ray, closestCollision, true)) {
 				
-			
+			    
 				selectionObject = (GameObject*)closestCollision.node;
+
+
+				if (selectionObject->GetName() == "floor" 
+					|| selectionObject->GetName()== "terrain" 
+					|| selectionObject->GetName() == "wall"
+					|| selectionObject->GetName() == "enemy") return false;
+
 				selectionObject->GetRenderObject()->SetColour(Vector4(1, 0, 0, 1));
 				return true;
 			}
@@ -712,7 +821,7 @@ void TutorialGame::MoveSelectedObject() {
     if (Window::GetKeyboard()->KeyPressed(KEYBOARD_P)) {
 	//world->GetPlayer()->GetPhysicsObject()->AddForce(-forceRayDir * forceMagnitude);
 		
-	world->GetPlayer()->GetPhysicsObject()->AddForceAtPosition(forceRayDir * forceMagnitude, playerPos);
+	world->GetPlayer()->GetPhysicsObject()->AddForceAtPosition(forceRayDir * forceMagnitude, forcePos);
 	}
 
 

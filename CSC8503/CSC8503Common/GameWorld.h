@@ -31,20 +31,31 @@ namespace NCL {
 			GameObject* GetPlayer() const {
 				return playerObj;
 			}
-
 			void SetPlayer(GameObject* player)
 			{
 				playerObj = player;
 
 			}
+			void SetEnemy(GameObject* enemy)
+			{
+				enemyObj = enemy;
 
-			GameObject* GetObsFan() const {
-				return obsFan;
 			}
 
-			void SetObsFan(GameObject* fan)
+			GameObject* GetEnemy() const {
+				return enemyObj;
+			}
+
+			
+
+
+			GameObject* GetMoveWall(int index ) const {
+				return obsMoveWall[index];
+			}
+
+			void SetObsMoveWall(GameObject* wall,int index)
 			{
-				obsFan = fan;
+				obsMoveWall[index]=wall;
 
 			}
 
@@ -69,6 +80,8 @@ namespace NCL {
 				std::vector<Constraint*>::const_iterator& first,
 				std::vector<Constraint*>::const_iterator& last) const;
 
+
+			float myTimer = 0.0f;
 		protected:
 			void UpdateTransforms();
 			void UpdateQuadTree();
@@ -82,10 +95,11 @@ namespace NCL {
 			Camera* mainCamera;
 
 			GameObject* playerObj=NULL;
+			GameObject* enemyObj = NULL;
 
-			GameObject* obsFan = NULL;
+			GameObject* obsMoveWall[2];
 
-
+			
 
 			bool shuffleConstraints;
 			bool shuffleObjects;

@@ -1,7 +1,9 @@
 #pragma once
 #include "GameTechRenderer.h"
 #include "../CSC8503Common/PhysicsSystem.h"
-
+#include "../CSC8503Common/StateMachine.h"
+#include "../CSC8503Common/StateTransition.h"
+#include "../CSC8503Common/State.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -13,7 +15,9 @@ namespace NCL {
 			virtual void UpdateGame(float dt);
 
 			int myLevel;
-			
+			int time=1;
+			int wallMoveDir = 1;
+			StateMachine *testMachine;
 		protected:
 			void InitialiseAssets();
 
@@ -28,7 +32,7 @@ namespace NCL {
 			test scenarios (constraints, collision types, and so on). 
 			*/
 			void InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius);
-			void InitGolfBall();
+			
 			void InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing);
 			void InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims);
 			void InitTerrain(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims);
@@ -42,19 +46,23 @@ namespace NCL {
 			void SimpleAABBTest();
 			void SimpleAABBTest2();
 
+			void CamFollow(Camera *c, GameObject *obj);
+			void FSM_MoveWall(int &time, GameWorld *g);
+			void Enemy_Chase(GameObject *enemy, GameObject *player);
 			bool SelectObject();
 			void MoveSelectedObject();
 
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
+			GameObject* AddEnemyToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
 			GameObject* AddTerrainToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
 			GameObject* AddObstacleToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
 
 			GameTechRenderer*	renderer;
 			PhysicsSystem*		physics;
 			GameWorld*			world;
-
+			
 			Vector3 forcePos;
 			Vector3 dirPoint;
 			float axisYoffset;
@@ -69,6 +77,7 @@ namespace NCL {
 			OGLMesh*	sphereMesh	= nullptr;
 			OGLTexture* ballTex = nullptr;
 			OGLTexture* basicTex	= nullptr;
+			OGLTexture* enemyTex = nullptr;
 			OGLTexture* terrainTex = nullptr;
 			OGLTexture* obsTex = nullptr;
 			OGLTexture* floorTex = nullptr;

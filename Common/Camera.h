@@ -20,6 +20,7 @@ namespace NCL {
 			this->farPlane	= 100.0f;
 
 			this->camType = CameraType::Perspective;
+			//this->camType = CameraType::Orthographic;
 		};
 
 		Camera(float pitch, float yaw, const Vector3& position) {
@@ -32,6 +33,8 @@ namespace NCL {
 			this->farPlane	= 100.0f;
 
 			this->camType	= CameraType::Perspective;
+
+			
 		}
 
 		~Camera(void) {};

@@ -11,7 +11,7 @@ GameWorld::GameWorld()	{
 	mainCamera = new Camera();
 
 	playerObj = nullptr;
-
+	enemyObj = nullptr;
 	quadTree = nullptr;
 
 	shuffleConstraints	= false;
