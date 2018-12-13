@@ -11,7 +11,7 @@ GameServer::GameServer(int onPort, int maxClients)	{
 	clientCount = 0;
 	netHandle	= nullptr;
 	threadAlive = false;
-
+	bestRecord = 0;
 	Initialise();
 }
 
@@ -27,6 +27,62 @@ void GameServer::Shutdown() {
 
 	enet_host_destroy(netHandle);
 	netHandle = nullptr;
+}
+
+vector<string> NCL::CSC8503::GameServer::String_Split(const string & s, const char & c)
+{
+	string buff = "";
+	vector<string> v;
+	for (auto t : s)
+	{
+		if (t != c)
+		{
+			buff += t;
+		}
+		else if (buff != "")
+		{
+			v.push_back(buff);
+			buff = "";
+		}
+	}
+	if (buff != "")
+		v.push_back(buff);
+	return v;
+}
+
+int NCL::CSC8503::GameServer::GetHighScore()
+{
+	string line;
+	ifstream myfile("example.txt");
+	if (myfile.is_open())
+	{
+		while (getline(myfile, line))
+		{
+			vector<string> v = String_Split(line, ' ');
+			if (v[0] != "playerID")
+			{
+				bestRecord = std::stoi(v[1]);
+			}
+		}
+		myfile.close();
+		
+	}
+
+	else cout << "Unable to open file";
+
+	return bestRecord;
+}
+
+void NCL::CSC8503::GameServer::UpLoadPlayerScore(int playerID,int playerScore)
+{
+	ofstream myfile("example.txt");
+	if (myfile.is_open())
+	{
+		myfile << "playerID" << " " << "playerScore" << endl;
+		myfile << std::to_string(playerID) << " " << std::to_string(playerScore) << endl;
+		myfile.close();
+	}
+	else cout << "Unable to open file";
 }
 
 bool GameServer::Initialise() {

@@ -7,6 +7,7 @@ using namespace CSC8503;
 
 GameClient::GameClient()	{
 	netHandle = enet_host_create(nullptr, 1, 1, 0, 0);
+	playerScore = 0;
 }
 
 GameClient::~GameClient()	{
@@ -41,6 +42,7 @@ void GameClient::UpdateClient() {
 		enet_packet_destroy(event.packet); 
 	} 
 }
+
 
 void GameClient::SendPacket(GamePacket&  payload) {
 	ENetPacket* dataPacket = enet_packet_create(&payload,  payload.GetTotalSize(), 0); 

@@ -110,3 +110,19 @@ protected:
 
 	std::multimap<int, PacketReceiver*> packetHandlers;
 };
+
+class MyPacketReceiver : public PacketReceiver {
+public:
+	MyPacketReceiver(std::string name) {
+		this->name = name;
+	}
+	void ReceivePacket(int type, GamePacket* payload, int source) {
+		if (type == BasicNetworkMessages::String) {
+			StringPacket* realPacket = (StringPacket*)payload;
+			std::string msg = realPacket->GetStringFromData();
+			std::cout << name << " received message: " << msg << std::endl;
+		}
+	}
+protected:
+	std::string name;
+};

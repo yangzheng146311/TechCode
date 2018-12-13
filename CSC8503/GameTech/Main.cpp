@@ -4,15 +4,17 @@
 #include "../CSC8503Common/StateTransition.h"
 #include "../CSC8503Common/State.h"
 
-#include "../CSC8503Common/GameServer.h"
-#include "../CSC8503Common/GameClient.h"
+
 
 #include "../CSC8503Common/NavigationGrid.h"
 #include "TutorialGame.h"
-#include "NetworkedGame.h"
+//#include "NetworkedGame.h"
+//#include "../CSC8503Common/GameServer.h"
+//#include "../CSC8503Common/GameClient.h"
 
 using namespace NCL;
 using namespace CSC8503;
+
 
 void TestStateMachine( ) {
 	StateMachine * testMachine = new StateMachine();
@@ -55,20 +57,24 @@ void TestStateMachine( ) {
 
 }
 
+
 class TestPacketReceiver : public PacketReceiver {
- public: 
-	 TestPacketReceiver(string name) { 
-		 this->name = name; 
-	 } 
-	 void ReceivePacket(int type, GamePacket* payload, int source) {
-	 if (type ==BasicNetworkMessages:: String) {
-		 StringPacket* realPacket = (StringPacket*)payload;
-		 string msg = realPacket->GetStringFromData(); 
-		 std::cout << name << " received message: " << msg << std::endl; 
-	 } 
-	 } 
-protected: 
-	string name; 
+public:
+	TestPacketReceiver(string name) {
+		this->name = name;
+	}
+	void ReceivePacket(int type, GamePacket* payload, int source) {
+		if (type == BasicNetworkMessages::String) {
+			StringPacket* realPacket = (StringPacket*)payload;
+			string msg = realPacket->GetStringFromData();
+			std::cout << name << " received message: " << msg << std::endl;
+
+			
+		
+		}
+	}
+protected:
+	string name;
 };
 
 
@@ -133,14 +139,19 @@ hide or show the
 
 
 
+
+
+
+
 int main() {
 	Window*w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720);
 	int stack = 1;
+	
 	if (!w->HasInitialised()) {
 		return -1;
 	}	
 	//TestStateMachine();
-	TestNetworking();
+	//TestNetworking();
 	//TestPathfinding();
 	
 	w->ShowOSPointer(false);
@@ -174,5 +185,12 @@ int main() {
 
 		g->UpdateGame(dt);
 	}
+	//std::cout << g->score << std::endl;
+	
+	
+
+
+
+
 	Window::DestroyGameWindow();
 }

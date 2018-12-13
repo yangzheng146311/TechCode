@@ -18,7 +18,8 @@ TutorialGame::TutorialGame()	{
 	testMachine = new StateMachine();
 	myLevel = 1;
 
-	int rand_int = 0;
+	
+
 	forceMagnitude	= 10.0f;
 	useGravity		= false;
 	inSelectionMode = false;
@@ -28,6 +29,7 @@ TutorialGame::TutorialGame()	{
 	Debug::SetRenderer(renderer);
 
 	InitialiseAssets();
+	
 }
 
 /*
@@ -57,11 +59,47 @@ void TutorialGame::InitialiseAssets() {
 
 	InitCamera();
 	InitWorld();
+	InitNetWork();
+	
+}
 
-	//srand((unsigned)time(NULL));
+void NCL::CSC8503::TutorialGame::InitNetWork()
+{
+	NetworkBase::Initialise();
+	serverReceiver=new MyPacketReceiver("Server");
+	clientReceiver= new MyPacketReceiver("Client");
+	int port = NetworkBase::GetDefaultPort();
+     server = new GameServer(port, 1);
+	 client = new GameClient();
+	server->RegisterPacketHandler(String, &(*serverReceiver));
+	client->RegisterPacketHandler(String, &(*clientReceiver));
+	bool canConnect = client->Connect(127, 0, 0, 1, port);
+
+	bestScore = server->GetHighScore();
+	/*server->SendGlobalMessage(
+		StringPacket("Server spawn!Local Server highest score : " + std::to_string(bestScore)));
+	client->SendPacket(
+		StringPacket("Client spawn!") );
+	server->UpdateServer();
+	client->UpdateClient();*/
+	
+
+	/*for (int i = 0; i < 100; ++i) {
+		server->SendGlobalMessage(
+			StringPacket("Server says hello! " + std::to_string(i)));
+		client->SendPacket(
+			StringPacket("Client says hello! " + std::to_string(i)));
+		server->UpdateServer();
+		client->UpdateClient();
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}*/
+	//NetworkBase::Destroy();
 }
 
 TutorialGame::~TutorialGame()	{
+	NetworkBase::Destroy();
+	delete serverReceiver;
+	delete clientReceiver;
 	delete cubeMesh;
 	delete sphereMesh;
 	delete basicTex;
@@ -78,13 +116,17 @@ TutorialGame::~TutorialGame()	{
 }
 
 void TutorialGame::UpdateGame(float dt) {
+
+	server->UpdateServer();
+	client->UpdateClient();
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
 
 	UpdateKeys();
-
-
+	
+	Debug::Print("High Score:" + std::to_string(bestScore), Vector2(10, 100));
+	Debug::Print("Current Score:"+ std::to_string(score), Vector2(10, 70));
 	if (useGravity) {
 		Debug::Print("(G)ravity on", Vector2(10, 40));
 	}
@@ -95,6 +137,12 @@ void TutorialGame::UpdateGame(float dt) {
 
 	world->myTimer += dt;
 
+	if (score > 0)
+	{
+		score = 300 - world->myTimer;
+		
+		//std::cout << score << std::endl;
+	}
 	
 
 	if (physics->getGravityState()&& world->myTimer>3)
@@ -188,6 +236,8 @@ void TutorialGame::UpdateKeys() {
 	
 }
 
+
+
 void TutorialGame::InitCamera() {
 	world->GetMainCamera()->SetNearPlane(3.0f);
 	world->GetMainCamera()->SetFarPlane(4200.0f);
@@ -202,6 +252,12 @@ void TutorialGame::InitCamera() {
 	//world->GetMainCamera()->SetYaw(0.0f);
 	//world->GetMainCamera()->SetPosition(Vector3(100,2000,0));
 }
+
+
+
+
+
+
 
 void TutorialGame::InitWorld() {
 	world->ClearAndErase();
@@ -894,3 +950,7 @@ void TutorialGame::MoveSelectedObject() {
 		//}
 	}
 }
+
+
+
+

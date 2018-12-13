@@ -142,12 +142,14 @@
   <ItemGroup>
     <ClCompile Include="GameTechRenderer.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MyFileHandler.cpp" />
     <ClCompile Include="NetworkedGame.cpp" />
     <ClCompile Include="NetworkPlayer.cpp" />
     <ClCompile Include="TutorialGame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTechRenderer.h" />
+    <ClInclude Include="MyFileHandler.h" />
     <ClInclude Include="NetworkedGame.h" />
     <ClInclude Include="NetworkPlayer.h" />
     <ClInclude Include="TutorialGame.h" />

@@ -3,7 +3,10 @@
 #include <atomic>
 
 #include "NetworkBase.h"
-
+#include <iostream>
+#include <fstream>
+#include<vector>
+using namespace std;
 namespace NCL {
 	namespace CSC8503 {
 		class GameWorld;
@@ -12,6 +15,9 @@ namespace NCL {
 			GameServer(int onPort, int maxClients);
 			~GameServer();
 
+			vector<string> String_Split(const string& s, const char& c);
+			int GetHighScore();
+			void UpLoadPlayerScore(int playerID,int playerScore);
 			bool Initialise();
 			void Shutdown();
 
@@ -33,6 +39,7 @@ namespace NCL {
 			int			clientMax;
 			int			clientCount;
 			GameWorld*	gameWorld;
+			int bestRecord;
 
 			std::atomic<bool> threadAlive;
 

@@ -4,7 +4,12 @@
 #include "../CSC8503Common/StateMachine.h"
 #include "../CSC8503Common/StateTransition.h"
 #include "../CSC8503Common/State.h"
+#include "NetworkedGame.h"
+#include "../CSC8503Common/GameServer.h"
+#include "../CSC8503Common/GameClient.h"
+#include"../CSC8503Common/NetworkBase.h"
 
+using namespace std;
 namespace NCL {
 	namespace CSC8503 {
 		class TutorialGame		{
@@ -13,20 +18,27 @@ namespace NCL {
 			~TutorialGame();
 
 			virtual void UpdateGame(float dt);
-
-			int stack = 1;
+			
+			
 			int myLevel;
 			int mytime=1;
 			int wallMoveDir = 1;
 			int rand_int_x = 0;
-			int rand_int_z = 0;
+			int score = 300;
+			int bestScore = 0;
+			
+			GameServer* server;
+			GameClient* client;
+			
+			MyPacketReceiver *serverReceiver;
+			MyPacketReceiver *clientReceiver;
 			StateMachine *testMachine;
 		protected:
 			void InitialiseAssets();
-
+			void InitNetWork();
 			void InitCamera();
 			void UpdateKeys();
-
+			
 			void InitWorld();
 
 			/*
@@ -54,6 +66,8 @@ namespace NCL {
 			void Enemy_Chase(GameObject *enemy, GameObject *player);
 			bool SelectObject();
 			void MoveSelectedObject();
+		
+			
 
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
@@ -86,6 +100,9 @@ namespace NCL {
 			OGLTexture* floorTex = nullptr;
 			OGLShader*	basicShader = nullptr;
 		};
+
+
+		
 	}
 }
 
