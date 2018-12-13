@@ -32,6 +32,7 @@ namespace NCL {
 			static const float UNIT_MULTIPLIER;
 			static const float UNIT_RECIPROCAL;
 			bool isTouchFloor = false;
+			
 
 		protected:
 			void BasicCollisionDetection();

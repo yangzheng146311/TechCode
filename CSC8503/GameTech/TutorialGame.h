@@ -19,13 +19,15 @@ namespace NCL {
 
 			virtual void UpdateGame(float dt);
 			
-			
+			bool ifGoToLevel_2 = false;
+			bool ifWin = false;
 			int myLevel;
 			int mytime=1;
 			int wallMoveDir = 1;
 			int rand_int_x = 0;
 			int score = 300;
 			int bestScore = 0;
+			
 			
 			GameServer* server;
 			GameClient* client;
@@ -40,6 +42,7 @@ namespace NCL {
 			void UpdateKeys();
 			
 			void InitWorld();
+			
 
 			/*
 			These are some of the world/object creation functions I created when testing the functionality
@@ -52,6 +55,7 @@ namespace NCL {
 			void InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims);
 			void InitTerrain(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims);
 			void InitCourt();
+			
 			void InitSphereCollisionTorqueTest();
 			void InitCubeCollisionTorqueTest();
 			void InitSphereAABBTest();

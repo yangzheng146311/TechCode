@@ -58,8 +58,11 @@ void TutorialGame::InitialiseAssets() {
 	basicShader = new OGLShader("GameTechVert.glsl", "GameTechFrag.glsl");
 
 	InitCamera();
-	InitWorld();
 	InitNetWork();
+	InitWorld();
+
+
+	
 	
 }
 
@@ -82,22 +85,7 @@ void NCL::CSC8503::TutorialGame::InitNetWork()
 			server->UpdateServer();
 			client->UpdateClient();
 	}
-	/*server->SendGlobalMessage(
-		StringPacket("Server spawn!Local Server highest score : " + std::to_string(bestScore)));
-	client->SendPacket(
-		StringPacket("Client spawn!") );
-	server->UpdateServer();
-	client->UpdateClient();*/
 	
-
-	/*for (int i = 0; i < 100; ++i) {
-		server->SendGlobalMessage(StringPacket("Server says hello! " + std::to_string(i)));
-		client->SendPacket(StringPacket("Client says hello! " + std::to_string(i)));
-		server->UpdateServer();
-		client->UpdateClient();
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}*/
-	//NetworkBase::Destroy();
 }
 
 TutorialGame::~TutorialGame()	{
@@ -124,6 +112,17 @@ TutorialGame::~TutorialGame()	{
 }
 
 void TutorialGame::UpdateGame(float dt) {
+
+
+
+	if (ifGoToLevel_2 == true)
+	{
+		InitWorld(); //We can reset the simulation at any time with F1
+		selectionObject = nullptr;
+		//world->myTimer = 0;
+		ifGoToLevel_2 = false;
+		
+	}
 	
 	if (Window::GetKeyboard()->KeyPressed(KEYBOARD_O)) {
 
@@ -147,6 +146,7 @@ void TutorialGame::UpdateGame(float dt) {
 	}
 
 	UpdateKeys();
+	Debug::Print("Level"+std::to_string(myLevel), Vector2(10, 600));
 	Debug::Print("Press O to upload score" , Vector2(10, 130));
 	Debug::Print("High Score:" + std::to_string(bestScore), Vector2(10, 100));
 	Debug::Print("Current Score:"+ std::to_string(score), Vector2(10, 70));
@@ -157,7 +157,7 @@ void TutorialGame::UpdateGame(float dt) {
 		Debug::Print("(G)ravity off", Vector2(10, 40));
 	}
 	 
-
+	 if(!ifWin)
 	world->myTimer += dt;
 
 	if (score > 0)
@@ -166,15 +166,25 @@ void TutorialGame::UpdateGame(float dt) {
 		
 		//std::cout << score << std::endl;
 	}
+
 	
 
-	if (physics->getGravityState()&& world->myTimer>3)
+	if (world->GetEnemy())
 	{
-		Enemy_Chase(world->GetEnemy(), world->GetPlayer());
-		
+		if (physics->getGravityState() && world->myTimer > 3)
+		{
+			Enemy_Chase(world->GetEnemy(), world->GetPlayer());
+
+		}
 	}
+
+
+	if(world->GetMoveWall(0)&& world->GetMoveWall(1))
+		FSM_MoveWall(mytime, world);
+	
+
+
 	CamFollow(world->GetMainCamera(), world->GetPlayer());
-	FSM_MoveWall(mytime, world);
 	SelectObject();
 	MoveSelectedObject();
 	world->UpdateWorld(dt);
@@ -183,8 +193,41 @@ void TutorialGame::UpdateGame(float dt) {
 
 
 	if (physics->isTouchFloor == true) {
-		myLevel = 2; 
-		physics->isTouchFloor = false;
+		if (myLevel == 1)
+		{
+			myLevel = 2;
+			physics->isTouchFloor = false;
+			ifGoToLevel_2 = true;
+		}
+
+		if (myLevel == 2)
+		{
+
+
+			Debug::Print("You are Win", Vector2(400, 300));
+			ifWin = true;
+			if (score > bestScore)
+
+			{
+
+				for (int i = 0; i < 2; i++)
+
+				{
+
+
+
+					//server->SendGlobalMessage(StringPacket("Server  OUT"));
+
+					client->SendPacket(StringPacket("1 " + std::to_string(score)));
+
+					server->UpdateServer();
+
+					client->UpdateClient();
+
+				}
+
+			}
+		}
 	}
 
 	Debug::FlushRenderables();
@@ -193,12 +236,15 @@ void TutorialGame::UpdateGame(float dt) {
 
 void TutorialGame::UpdateKeys() {
 
+
 	
 	
-	if (Window::GetKeyboard()->KeyPressed(KEYBOARD_R)|| myLevel == 2) {
+	
+	if (Window::GetKeyboard()->KeyPressed(KEYBOARD_R)) {
+		//InitialiseAssets();
 		InitWorld(); //We can reset the simulation at any time with F1
+		
 		selectionObject = nullptr;
-		myLevel = 1;
 		world->myTimer = 0;
 	}
 
@@ -316,6 +362,8 @@ void TutorialGame::InitWorld() {
 
 	//InitSphereCollisionTorqueTest(w);
 }
+
+
 
 /*
 
@@ -519,8 +567,10 @@ void TutorialGame::InitTerrain(int numRows, int numCols, float rowSpacing, float
 
 void TutorialGame::InitCourt() {
 
-	//Terrain
-	
+	if (myLevel == 1)
+	{
+		//Terrain
+
 		float holeSize = 25.0f;
 		float depth = holeSize;
 		float blockALong = 1000.0f;
@@ -544,15 +594,14 @@ void TutorialGame::InitCourt() {
 		AddTerrainToWorld(pos2, blockA_Dims, 0.0f);
 		AddTerrainToWorld(pos3, blockB_Dims, 0.0f);
 		AddTerrainToWorld(pos4, blockC_Dims, 0.0f);
-	
 
-	//Edge
-	
-		Vector3 EA_Dims = Vector3(1000, holeSize*3, 25);
-		Vector3 EB_Dims = Vector3(25, holeSize*3, 950);
+		//Edge
 
-		Vector3 posA(0, depth*5, 975);
-		Vector3 posB(0, depth*5,-975);
+		Vector3 EA_Dims = Vector3(1000, holeSize * 3, 25);
+		Vector3 EB_Dims = Vector3(25, holeSize * 3, 950);
+
+		Vector3 posA(0, depth * 5, 975);
+		Vector3 posB(0, depth * 5, -975);
 		Vector3 posC(975, depth * 5, 0);
 		Vector3 posD(-975, depth * 5, 0);
 
@@ -561,7 +610,68 @@ void TutorialGame::InitCourt() {
 		AddObstacleToWorld(posC, EB_Dims, 0.0f);
 		AddObstacleToWorld(posD, EB_Dims, 0.0f);
 
-	//Obstacle
+		//PlayerBall
+		Vector3 ballPos(-100, depth * 5, 0);
+		float radius = (20.0f);
+		world->SetPlayer(AddSphereToWorld(ballPos, radius, 0.05f));
+		world->GetPlayer()->SetName("player");
+
+		Vector3 playerPos = world->GetPlayer()->GetTransform().GetWorldPosition();
+		Vector3 newCamPos = Vector3(playerPos.x, playerPos.y + 500, playerPos.z + 500);
+		world->GetMainCamera()->SetPosition(newCamPos);
+		//Floor
+		AddFloorToWorld(Vector3(10, -10, 1));
+	}
+
+	if (myLevel == 2)
+	{
+
+		//Terrain
+		float holeSize = 25.0f;
+		float depth = holeSize;
+		float blockALong = 1000.0f;
+		int unit = (blockALong / holeSize);
+		int holePosUnit = 10;
+		float blockAWidth = (blockALong - holeSize) *0.5f;
+		float blockBLong = holeSize * holePosUnit;
+		float blockCLong = holeSize * (unit - holePosUnit - 1);
+		float blockBWidth = holeSize;
+		float blockCWidth = holeSize;
+		Vector3 blockA_Dims = Vector3(blockALong, depth, blockAWidth);
+		Vector3 blockB_Dims = Vector3(blockBLong, depth, blockBWidth);
+		Vector3 blockC_Dims = Vector3(blockCLong, depth, blockCWidth);
+
+		Vector3 pos1(0, depth, holeSize + blockAWidth);
+		Vector3 pos2(0, depth, -(holeSize + blockAWidth));
+		Vector3 pos3((unit - holePosUnit)*holeSize, depth, 0);
+		Vector3 pos4((-holePosUnit - 1)*holeSize, depth, 0);
+
+		AddTerrainToWorld(pos1, blockA_Dims, 0.0f);
+		AddTerrainToWorld(pos2, blockA_Dims, 0.0f);
+		AddTerrainToWorld(pos3, blockB_Dims, 0.0f);
+		AddTerrainToWorld(pos4, blockC_Dims, 0.0f);
+
+
+		//Edge
+
+		Vector3 EA_Dims = Vector3(1000, holeSize * 3, 25);
+		Vector3 EB_Dims = Vector3(25, holeSize * 3, 950);
+
+		Vector3 posA(0, depth * 5, 975);
+		Vector3 posB(0, depth * 5, -975);
+		Vector3 posC(975, depth * 5, 0);
+		Vector3 posD(-975, depth * 5, 0);
+
+		AddObstacleToWorld(posA, EA_Dims, 0.0f);
+		AddObstacleToWorld(posB, EA_Dims, 0.0f);
+		AddObstacleToWorld(posC, EB_Dims, 0.0f);
+		AddObstacleToWorld(posD, EB_Dims, 0.0f);
+
+
+
+
+
+		//Obstacle
 		Vector3 OBS_LeftRight = Vector3(675, holeSize * 3, 25);
 		Vector3 OBS_Top = Vector3(25, holeSize * 3, 675);
 		//Vector3 OBS_Door = Vector3(25, holeSize * 3, 200);
@@ -575,44 +685,38 @@ void TutorialGame::InitCourt() {
 		Vector3 posLdoor(400, depth * 5, 300);
 		Vector3 posMoveWall_A(-400, depth * 5, 0);
 		Vector3 posMoveWall_B(200, depth * 5, 0);
-		
+
 
 		AddObstacleToWorld(posR, OBS_LeftRight, 0.0f);
 		AddObstacleToWorld(posL, OBS_LeftRight, 0.0f);
 		AddObstacleToWorld(posT, OBS_Top, 0.0f);
 		//AddObstacleToWorld(posRdoor, OBS_Door, 0.0f);
 		//AddObstacleToWorld(posLdoor, OBS_Door, 0.0f);
-		world->SetObsMoveWall(AddObstacleToWorld(posMoveWall_A, OBS_MoveWall,0.0f),0);
+		world->SetObsMoveWall(AddObstacleToWorld(posMoveWall_A, OBS_MoveWall, 0.0f), 0);
 		world->SetObsMoveWall(AddObstacleToWorld(posMoveWall_B, OBS_MoveWall, 0.0f), 1);
 
-
-
-
-
-	//PlayerBall
-		Vector3 ballPos(-100, depth * 5, 0);
-		float radius = (20.0f);
-		world->SetPlayer(AddSphereToWorld(ballPos, radius,0.05f));
-		world->GetPlayer()->SetName("player");
-
-		Vector3 playerPos = world->GetPlayer()->GetTransform().GetWorldPosition();
-		Vector3 newCamPos = Vector3(playerPos.x, playerPos.y+500, playerPos.z+500);
-		world->GetMainCamera()->SetPosition(newCamPos);
-
-	//EnemyCube
+		//EnemyCube
 		Vector3 ePos(0, depth * 5, 0);
 		float eRadius = 20.0f;
 		world->SetEnemy(AddEnemyToWorld(ePos, eRadius, 1.05f));
-		
-		
-
-	
-
-	//Floor
-	AddFloorToWorld(Vector3(10, -10, 1));
 
 
+		//PlayerBall
+		Vector3 ballPos(-100, depth * 5, 0);
+		float radius = (20.0f);
+		world->SetPlayer(AddSphereToWorld(ballPos, radius, 0.05f));
+		world->GetPlayer()->SetName("player");
+
+		Vector3 playerPos = world->GetPlayer()->GetTransform().GetWorldPosition();
+		Vector3 newCamPos = Vector3(playerPos.x, playerPos.y + 500, playerPos.z + 500);
+		world->GetMainCamera()->SetPosition(newCamPos);
+
+		//Floor
+		AddFloorToWorld(Vector3(10, -10, 1));
+	}
 }
+
+
 
 
 
@@ -781,52 +885,49 @@ void NCL::CSC8503::TutorialGame::FSM_MoveWall(int  &time, GameWorld * g)
 void NCL::CSC8503::TutorialGame::Enemy_Chase(GameObject * enemy, GameObject * player)
 {
 	
-	
-
+	if ((int)world->myTimer % 1 == 0)
+		rand_int_x = 0 + rand() % 360;
+	GameObject* obj=nullptr;
 	Vector3 ePos = enemy->GetTransform().GetWorldPosition();
 	Vector3 pPos = player->GetTransform().GetWorldPosition();
+	Vector3 eEyePos(ePos.x,ePos.y+100,ePos.z);
+	Vector3 pEyePos(pPos.x, pPos.y, pPos.z);
 	Vector3 eVdir = pPos - ePos;
 	Vector3 eVdirN = eVdir.Normalised();
+	Ray ray_EP(eEyePos,(pEyePos-eEyePos).Normalised());
+	//Debug::DrawLine(eEyePos, pEyePos, Vector4(1, 0, 1, 1));
 
-	if((int)world->myTimer%1==0)
-	{
-		rand_int_x = 0+ rand() % 360;
-		//rand_int_z = -1 + rand() % 2;
-	}
+	RayCollision closestCollision;
+	if (world->Raycast(ray_EP, closestCollision, true)) {
 
-	//if ((int)world->myTimer % 2 == 0)
-	//{
-	//	rand_int_z = -100 + rand() % 200;
-	//	//rand_int_z = -1 + rand() % 2;
-	//}
+		 obj = (GameObject * )closestCollision.node;
+		 //std::cout << obj->GetName() << std::endl;
+		 if (obj&&obj->GetName() != "wall") {
+			 //std::cout << "I can see u" << std::endl;
+			 enemy->GetPhysicsObject()->AddForceAtPosition(eVdirN*5.0f, ePos);
+		 }
 
 
-	//std::cout << rand_int << std::endl;
-	//std::cout << (int)world->myTimer << std::endl;
+		 else
+		 {
+			 //std::cout << "go arround" << std::endl;
+			 Vector3 surroundPoint(Vector3(ePos.x + cos(rand_int_x), ePos.y, ePos.z + sin(rand_int_x)));
+			 Vector3 patrollDir = surroundPoint - ePos;
+			 Vector3 normal = patrollDir.Normalised();
+			 enemy->GetPhysicsObject()->AddForceAtPosition(normal*100.0f, ePos);
+		 }
 
-	if (eVdir.Length() < 400.0f) {
-
-		enemy->GetPhysicsObject()->AddForceAtPosition(eVdirN*5.0f,ePos);
 	}
 
 	
+
+
+
+
 	
 
-
-	else
-	{
-		
-			
-			//std::cout << rand_int_x << std::endl;
-			Vector3 surroundPoint(Vector3(ePos.x + cos(rand_int_x), ePos.y, ePos.z + sin(rand_int_x)));
-			Vector3 patrollDir = surroundPoint - ePos;
-			Vector3 normal = patrollDir.Normalised();
-			enemy->GetPhysicsObject()->AddForceAtPosition(normal*100.0f,ePos);
-			
-		
-
-		//enemy->GetPhysicsObject()->SetLinearVelocity(eVdir*5.0f);
-	}
+	
+	
 }
 
 /*

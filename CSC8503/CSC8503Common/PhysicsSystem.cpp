@@ -153,7 +153,7 @@ void PhysicsSystem::BasicCollisionDetection() {
 				ImpulseResolveCollision(*info.a, *info.b, info.point);
 				info.framesLeft = numCollisionFrames; 
 				allCollisions.insert(info); 
-
+				
 				if ((*j)->GetName() == "floor" && (*i)->GetName() == "player")
 				{
 
@@ -161,10 +161,10 @@ void PhysicsSystem::BasicCollisionDetection() {
 					isTouchFloor = true;
 				}
 
-				if ((*j)->GetName() == "enemy" && (*i)->GetName() == "player")
+				if ((*j)->GetName() == "player" && (*i)->GetName() == "enemy")
 				{
-
-					//std::cout << "GG" << std::endl;
+					/*std::cout << "Collision between " << (*i)->GetName() << " and " << (*j)->GetName() << std::endl;
+					std::cout << "GG" << std::endl;*/
 					(*i)->GetTransform().SetWorldPosition(Vector3(0, 500,0));
 					(*j)->GetTransform().SetWorldPosition(Vector3(-500, 500, 0));
 					

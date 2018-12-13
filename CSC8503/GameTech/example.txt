@@ -1,2 +1,2 @@
 playerID playerScore
-1 298
+1 290
