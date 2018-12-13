@@ -147,7 +147,7 @@ void TutorialGame::UpdateGame(float dt) {
 	}
 
 	UpdateKeys();
-	
+	Debug::Print("Press O to upload score" , Vector2(10, 130));
 	Debug::Print("High Score:" + std::to_string(bestScore), Vector2(10, 100));
 	Debug::Print("Current Score:"+ std::to_string(score), Vector2(10, 70));
 	if (useGravity) {
