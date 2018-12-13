@@ -20,6 +20,7 @@ bool NetworkBase::ProcessPacket(GamePacket * p, int peerID)
 	if (canHandle) { 
 		for (auto i = firstHandler; i != lastHandler; ++i) { 
 			i->second->ReceivePacket(p->type, p, peerID); 
+			
 		} 
 		return true; 
 	} 

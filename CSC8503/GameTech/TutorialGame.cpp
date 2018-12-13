@@ -66,8 +66,8 @@ void TutorialGame::InitialiseAssets() {
 void NCL::CSC8503::TutorialGame::InitNetWork()
 {
 	NetworkBase::Initialise();
-	serverReceiver=new MyPacketReceiver("Server");
-	clientReceiver= new MyPacketReceiver("Client");
+	serverReceiver=new MyServerPacketReceiver("Server");
+	clientReceiver= new MyClientPacketReceiver("Client");
 	int port = NetworkBase::GetDefaultPort();
      server = new GameServer(port, 1);
 	 client = new GameClient();
@@ -76,6 +76,12 @@ void NCL::CSC8503::TutorialGame::InitNetWork()
 	bool canConnect = client->Connect(127, 0, 0, 1, port);
 
 	bestScore = server->GetHighScore();
+	for (int i = 0; i < 4; i++)
+	{
+			server->SendGlobalMessage(StringPacket("Server spawn!Local Server highest score : " + std::to_string(bestScore)));
+			server->UpdateServer();
+			client->UpdateClient();
+	}
 	/*server->SendGlobalMessage(
 		StringPacket("Server spawn!Local Server highest score : " + std::to_string(bestScore)));
 	client->SendPacket(
@@ -85,10 +91,8 @@ void NCL::CSC8503::TutorialGame::InitNetWork()
 	
 
 	/*for (int i = 0; i < 100; ++i) {
-		server->SendGlobalMessage(
-			StringPacket("Server says hello! " + std::to_string(i)));
-		client->SendPacket(
-			StringPacket("Client says hello! " + std::to_string(i)));
+		server->SendGlobalMessage(StringPacket("Server says hello! " + std::to_string(i)));
+		client->SendPacket(StringPacket("Client says hello! " + std::to_string(i)));
 		server->UpdateServer();
 		client->UpdateClient();
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -97,6 +101,10 @@ void NCL::CSC8503::TutorialGame::InitNetWork()
 }
 
 TutorialGame::~TutorialGame()	{
+	
+	
+
+
 	NetworkBase::Destroy();
 	delete serverReceiver;
 	delete clientReceiver;
@@ -116,9 +124,24 @@ TutorialGame::~TutorialGame()	{
 }
 
 void TutorialGame::UpdateGame(float dt) {
+	
+	if (Window::GetKeyboard()->KeyPressed(KEYBOARD_O)) {
 
-	server->UpdateServer();
-	client->UpdateClient();
+		if (score > bestScore)
+		{
+			for (int i = 0; i < 2; i++)
+			{
+
+				//server->SendGlobalMessage(StringPacket("Server  OUT"));
+				client->SendPacket(StringPacket("1 " + std::to_string(score)));
+				server->UpdateServer();
+				client->UpdateClient();
+			}
+		}
+	}
+
+	
+	
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}

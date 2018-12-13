@@ -30,8 +30,8 @@ namespace NCL {
 			GameServer* server;
 			GameClient* client;
 			
-			MyPacketReceiver *serverReceiver;
-			MyPacketReceiver *clientReceiver;
+			MyServerPacketReceiver *serverReceiver;
+			MyClientPacketReceiver *clientReceiver;
 			StateMachine *testMachine;
 		protected:
 			void InitialiseAssets();

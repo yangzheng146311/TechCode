@@ -1,7 +1,6 @@
 #include "GameServer.h"
 #include "GameWorld.h"
 #include <iostream>
-
 using namespace NCL;
 using namespace CSC8503;
 
@@ -29,26 +28,7 @@ void GameServer::Shutdown() {
 	netHandle = nullptr;
 }
 
-vector<string> NCL::CSC8503::GameServer::String_Split(const string & s, const char & c)
-{
-	string buff = "";
-	vector<string> v;
-	for (auto t : s)
-	{
-		if (t != c)
-		{
-			buff += t;
-		}
-		else if (buff != "")
-		{
-			v.push_back(buff);
-			buff = "";
-		}
-	}
-	if (buff != "")
-		v.push_back(buff);
-	return v;
-}
+
 
 int NCL::CSC8503::GameServer::GetHighScore()
 {
@@ -58,7 +38,7 @@ int NCL::CSC8503::GameServer::GetHighScore()
 	{
 		while (getline(myfile, line))
 		{
-			vector<string> v = String_Split(line, ' ');
+			vector<string> v = MyServerPacketReceiver::String_Split(line, ' ');
 			if (v[0] != "playerID")
 			{
 				bestRecord = std::stoi(v[1]);
@@ -73,17 +53,7 @@ int NCL::CSC8503::GameServer::GetHighScore()
 	return bestRecord;
 }
 
-void NCL::CSC8503::GameServer::UpLoadPlayerScore(int playerID,int playerScore)
-{
-	ofstream myfile("example.txt");
-	if (myfile.is_open())
-	{
-		myfile << "playerID" << " " << "playerScore" << endl;
-		myfile << std::to_string(playerID) << " " << std::to_string(playerScore) << endl;
-		myfile.close();
-	}
-	else cout << "Unable to open file";
-}
+
 
 bool GameServer::Initialise() {
 	ENetAddress address;

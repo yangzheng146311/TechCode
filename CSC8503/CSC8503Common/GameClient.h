@@ -20,24 +20,17 @@ namespace NCL {
 			void SendPacket(GamePacket&  payload);
 
 			void UpdateClient();
-			const int GetScore() { return playerScore; }
+			/*const int GetScore() { return playerScore; }
 			void SetScore(int s) {
 
 				playerScore = s;
-			}
+			}*/
 
 			
-			
-				
-
-
-			
-			
-
 		protected:
 			
 			void ThreadedUpdate();
-			int playerScore;
+			/*int playerScore;*/
 			ENetPeer*	netPeer;
 			std::atomic<bool>	threadAlive;
 			std::thread			updateThread;

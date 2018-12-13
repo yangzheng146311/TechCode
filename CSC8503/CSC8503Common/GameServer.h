@@ -15,9 +15,9 @@ namespace NCL {
 			GameServer(int onPort, int maxClients);
 			~GameServer();
 
-			vector<string> String_Split(const string& s, const char& c);
+			
 			int GetHighScore();
-			void UpLoadPlayerScore(int playerID,int playerScore);
+			
 			bool Initialise();
 			void Shutdown();
 

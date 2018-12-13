@@ -3,7 +3,9 @@
 #include <map>
 #include <string>
 #include<iostream>
-
+#include<fstream>
+#include<vector>
+using namespace std;
 enum BasicNetworkMessages {
 	None,
 	Hello,
@@ -111,9 +113,63 @@ protected:
 	std::multimap<int, PacketReceiver*> packetHandlers;
 };
 
-class MyPacketReceiver : public PacketReceiver {
+class MyServerPacketReceiver : public PacketReceiver {
 public:
-	MyPacketReceiver(std::string name) {
+	MyServerPacketReceiver(std::string name) {
+		this->name = name;
+	}
+	void ReceivePacket(int type, GamePacket* payload, int source) {
+		if (type == BasicNetworkMessages::String) {
+			StringPacket* realPacket = (StringPacket*)payload;
+			std::string msg = realPacket->GetStringFromData();
+			vector<string> v = String_Split(msg, ' ');
+			int pID = std::stoi(v[0]);
+			int pS = std::stoi(v[1]);
+			std::cout  << " Server received message: "  << "player" << std::stoi(v[0])<<" UpLoad Score "<< std::stoi(v[1])<< std::endl;
+			UpLoadPlayerScore(pID, pS);
+
+		}
+	}
+	void UpLoadPlayerScore(int playerID, int playerScore) {
+
+		ofstream myfile("example.txt");
+		if (myfile.is_open())
+		{
+			myfile << "playerID" << " " << "playerScore" << endl;
+			myfile << std::to_string(playerID) << " " << std::to_string(playerScore) << endl;
+			myfile.close();
+		}
+		else cout << "Unable to open file";
+	}
+
+	static vector<string> String_Split(const string& s, const char& c) {
+		string buff = "";
+		vector<string> v;
+		for (auto t : s)
+		{
+			if (t != c)
+			{
+				buff += t;
+			}
+			else if (buff != "")
+			{
+				v.push_back(buff);
+				buff = "";
+			}
+		}
+		if (buff != "")
+			v.push_back(buff);
+		return v;
+	}
+	
+
+
+protected:
+	std::string name;
+};
+class  MyClientPacketReceiver : public PacketReceiver {
+public:
+	MyClientPacketReceiver(std::string name) {
 		this->name = name;
 	}
 	void ReceivePacket(int type, GamePacket* payload, int source) {
@@ -123,6 +179,11 @@ public:
 			std::cout << name << " received message: " << msg << std::endl;
 		}
 	}
+
+
+
+
+
 protected:
 	std::string name;
 };
