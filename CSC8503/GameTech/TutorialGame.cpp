@@ -692,7 +692,7 @@ void TutorialGame::InitCourt() {
 		world->SetObsMoveWall(AddObstacleToWorld(posMoveWall_B, OBS_MoveWall, 0.0f), 1);
 
 		//EnemyCube
-		Vector3 ePos(0, depth * 5, 0);
+		Vector3 ePos(200, depth * 5, 0);
 		float eRadius = 20.0f;
 		world->SetEnemy(AddEnemyToWorld(ePos, eRadius, 1.05f));
 
