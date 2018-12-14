@@ -8,6 +8,7 @@
 #include "../CSC8503Common/GameServer.h"
 #include "../CSC8503Common/GameClient.h"
 #include"../CSC8503Common/NetworkBase.h"
+#include<math.h>
 
 using namespace std;
 namespace NCL {

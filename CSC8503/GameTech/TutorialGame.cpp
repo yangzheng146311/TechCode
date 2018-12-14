@@ -121,6 +121,7 @@ void TutorialGame::UpdateGame(float dt) {
 		selectionObject = nullptr;
 		//world->myTimer = 0;
 		ifGoToLevel_2 = false;
+
 		
 	}
 	
@@ -157,7 +158,8 @@ void TutorialGame::UpdateGame(float dt) {
 		Debug::Print("(G)ravity off", Vector2(10, 40));
 	}
 	 
-	 if(!ifWin)
+	 
+	if(!ifWin)
 	world->myTimer += dt;
 
 	if (score > 0)
@@ -171,7 +173,7 @@ void TutorialGame::UpdateGame(float dt) {
 
 	if (world->GetEnemy())
 	{
-		if (physics->getGravityState() && world->myTimer > 3)
+		if (physics->getGravityState() && world->myTimer > 3&&!ifWin)
 		{
 			Enemy_Chase(world->GetEnemy(), world->GetPlayer());
 
@@ -190,7 +192,8 @@ void TutorialGame::UpdateGame(float dt) {
 	world->UpdateWorld(dt);
 	renderer->Update(dt);
 	physics->Update(dt);
-
+	Debug::FlushRenderables();
+	renderer->Render();
 
 	if (physics->isTouchFloor == true) {
 		if (myLevel == 1)
@@ -198,6 +201,7 @@ void TutorialGame::UpdateGame(float dt) {
 			myLevel = 2;
 			physics->isTouchFloor = false;
 			ifGoToLevel_2 = true;
+			return;
 		}
 
 		if (myLevel == 2)
@@ -207,14 +211,9 @@ void TutorialGame::UpdateGame(float dt) {
 			Debug::Print("You are Win", Vector2(400, 300));
 			ifWin = true;
 			if (score > bestScore)
-
 			{
-
 				for (int i = 0; i < 2; i++)
-
 				{
-
-
 
 					//server->SendGlobalMessage(StringPacket("Server  OUT"));
 
@@ -229,9 +228,6 @@ void TutorialGame::UpdateGame(float dt) {
 			}
 		}
 	}
-
-	Debug::FlushRenderables();
-	renderer->Render();
 }
 
 void TutorialGame::UpdateKeys() {
@@ -835,8 +831,25 @@ void TutorialGame::SimpleAABBTest2() {
 void NCL::CSC8503::TutorialGame::CamFollow(Camera * c, GameObject * obj)
 {
 	Vector3 playerPos = obj->GetTransform().GetWorldPosition();
-	Vector3 newCamPos = Vector3(playerPos.x, playerPos.y + 500, playerPos.z + 500);
+	//Vector3 newCamPos = Vector3(playerPos.x, playerPos.y + 500, playerPos.z + 500);
+	Vector3 newCamPos = Vector3(playerPos.x, playerPos.y + 500, playerPos.z+500);
 	c->SetPosition(newCamPos);
+
+
+	/*Vector3 cPos = c->GetPosition();
+	Vector3 oPos = obj->GetTransform().GetWorldPosition();
+	float distance = (cPos - oPos).Length();
+	float dx = distance - cos(Window::GetMouse()->GetRelativePosition().x)*distance;
+	float newX = cPos.x -= distance - dx;
+
+	float dz = sin(Window::GetMouse()->GetRelativePosition().x);
+	float newZ = cPos.z += dz;*/
+	
+	//c->SetPosition(Vector3(newX, cPos.y, newZ));
+	
+		
+
+
 }
 
 void NCL::CSC8503::TutorialGame::FSM_MoveWall(int  &time, GameWorld * g)

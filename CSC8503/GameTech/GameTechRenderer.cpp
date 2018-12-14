@@ -184,7 +184,6 @@ void GameTechRenderer::SetupDebugMatrix(OGLShader*s) {
 	float screenAspect = (float)currentWidth / (float)currentHeight;
 	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
 	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
-
 	Matrix4 vp = projMatrix * viewMatrix;
 
 	int matLocation = glGetUniformLocation(s->GetProgramID(), "viewProjMatrix");
