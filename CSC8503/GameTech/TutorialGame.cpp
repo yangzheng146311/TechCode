@@ -23,6 +23,7 @@ TutorialGame::TutorialGame()	{
 	forceMagnitude	= 10.0f;
 	useGravity		= false;
 	inSelectionMode = false;
+	GameRunning = false;
 
 	
 
@@ -113,126 +114,40 @@ TutorialGame::~TutorialGame()	{
 
 void TutorialGame::UpdateGame(float dt) {
 
-
-
-	if (ifGoToLevel_2 == true)
-	{
-		InitWorld(); //We can reset the simulation at any time with F1
-		selectionObject = nullptr;
-		//world->myTimer = 0;
-		ifGoToLevel_2 = false;
-
-		
-	}
-	
-	if (Window::GetKeyboard()->KeyPressed(KEYBOARD_O)) {
-
-		if (score > bestScore)
-		{
-			for (int i = 0; i < 2; i++)
-			{
-
-				//server->SendGlobalMessage(StringPacket("Server  OUT"));
-				client->SendPacket(StringPacket("1 " + std::to_string(score)));
-				server->UpdateServer();
-				client->UpdateClient();
-			}
-		}
-	}
-
-	
-	
-	if (!inSelectionMode) {
+	if (!inSelectionMode&&GameRunning) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
 
 	UpdateKeys();
-	Debug::Print("Level"+std::to_string(myLevel), Vector2(10, 600));
-	Debug::Print("Press O to upload score" , Vector2(10, 130));
-	Debug::Print("High Score:" + std::to_string(bestScore), Vector2(10, 100));
-	Debug::Print("Current Score:"+ std::to_string(score), Vector2(10, 70));
-	if (useGravity) {
-		Debug::Print("(G)ravity on", Vector2(10, 40));
-	}
-	 {
-		Debug::Print("(G)ravity off", Vector2(10, 40));
-	}
-	 
-	 
-	if(!ifWin)
-	world->myTimer += dt;
-
-	if (score > 0)
-	{
-		score = 300 - world->myTimer;
-		
-		//std::cout << score << std::endl;
-	}
+	UI();
+    ScoreCalculating();
 
 	
-
-	if (world->GetEnemy())
-	{
-		if (physics->getGravityState() && world->myTimer > 3&&!ifWin)
-		{
-			Enemy_Chase(world->GetEnemy(), world->GetPlayer());
-
-		}
-	}
-
-
-	if(world->GetMoveWall(0)&& world->GetMoveWall(1))
-		FSM_MoveWall(mytime, world);
-	
-
-
 	CamFollow(world->GetMainCamera(), world->GetPlayer());
-	SelectObject();
-	MoveSelectedObject();
+	if (GameRunning)
+	{
+		TimeCalculating(dt);
+		UpdateEnemy();
+		UpdateWall();
+		SelectObject();
+		MoveSelectedObject();
+	}
 	world->UpdateWorld(dt);
 	renderer->Update(dt);
 	physics->Update(dt);
+
 	Debug::FlushRenderables();
 	renderer->Render();
 
-	if (physics->isTouchFloor == true) {
-		if (myLevel == 1)
-		{
-			myLevel = 2;
-			physics->isTouchFloor = false;
-			ifGoToLevel_2 = true;
-			return;
-		}
-
-		if (myLevel == 2)
-		{
-
-
-			Debug::Print("You are Win", Vector2(400, 300));
-			ifWin = true;
-			if (score > bestScore)
-			{
-				for (int i = 0; i < 2; i++)
-				{
-
-					//server->SendGlobalMessage(StringPacket("Server  OUT"));
-
-					client->SendPacket(StringPacket("1 " + std::to_string(score)));
-
-					server->UpdateServer();
-
-					client->UpdateClient();
-
-				}
-
-			}
-		}
-	}
+	LevelSwitch();
 }
 
 void TutorialGame::UpdateKeys() {
 
-
+	if (Window::GetKeyboard()->KeyPressed(KEYBOARD_O)) {
+		if (!GameRunning) GameRunning = true;
+		else GameRunning = false;
+	}
 	
 	
 	
@@ -335,28 +250,122 @@ void TutorialGame::InitWorld() {
 
 	
 	
-	//InitSphereGridWorld(10, 10, 50.0f, 50.0f, 10.0f);
+}
 
-	//InitSphereGridWorld(w, 10, 10, 50.0f, 50.0f, 10.0f);
+void NCL::CSC8503::TutorialGame::UI()
+{
 
-	//InitSphereGridWorld(w, 1, 1, 50.0f, 50.0f, 10.0f);
-	//InitCubeGridWorld(w,1, 1, 50.0f, 50.0f, Vector3(10, 10, 10));
-	//InitCubeGridWorld(w, 1, 1, 50.0f, 50.0f, Vector3(8, 8, 8));
+	if (GameRunning)
+	{
 
-	//InitSphereCollisionTorqueTest(w);
-	//InitCubeCollisionTorqueTest(w);
+		Debug::Print("Level:" + std::to_string(myLevel), Vector2(10, 600));
+		Debug::Print("Press O to Pause Game", Vector2(10, 130));
+		Debug::Print("High Score:" + std::to_string(bestScore), Vector2(10, 100));
+		Debug::Print("Current Score:" + std::to_string(score), Vector2(10, 70));
 
-	//InitSphereGridWorld(w, 1, 1, 50.0f, 50.0f, 10.0f);
-	//BridgeConstraintTest(w);
-	//InitGJKWorld(w);
+		if (useGravity) {
+			Debug::Print("(G)ravity on", Vector2(10, 40));
+		}
+		else
 
-	//DodgyRaycastTest(w);
-	//InitGJKWorld(w);
-	//InitSphereAABBTest(w);
-	//SimpleGJKTest(w);
-	//SimpleAABBTest2(w);
+		{
+			Debug::Print("(G)ravity off", Vector2(10, 40));
+		}
+	}
+	else
+	{
+		Debug::Print("Press 'O' to Start or Resume  ", Vector2(200, 300));
+	}
+}
 
-	//InitSphereCollisionTorqueTest(w);
+void NCL::CSC8503::TutorialGame::ScoreCalculating()
+{
+	if (score > 0)
+	{
+		score = 300 - world->myTimer;
+
+	}
+}
+
+void NCL::CSC8503::TutorialGame::TimeCalculating(float dt)
+{
+
+	if (!ifWin)
+		world->myTimer += dt;
+
+}
+
+void NCL::CSC8503::TutorialGame::LevelSwitch()
+{
+	if (ifGoToLevel_2 == true)
+	{
+		InitWorld(); //We can reset the simulation at any time with F1
+		selectionObject = nullptr;
+		//world->myTimer = 0;
+		ifGoToLevel_2 = false;
+
+
+	}
+
+	if (physics->enemyTouchFloor == true)
+	{
+
+		physics->enemyTouchFloor = false;
+		world->GetEnemy()->GetTransform().SetWorldPosition(Vector3(0, 100, 0));
+	}
+
+
+	if (physics->isTouchFloor == true) {
+		if (myLevel == 1)
+		{
+			myLevel = 2;
+			physics->isTouchFloor = false;
+			ifGoToLevel_2 = true;
+			return;
+		}
+
+		if (myLevel == 2)
+		{
+
+
+			Debug::Print("You are Win", Vector2(400, 300));
+			ifWin = true;
+			if (score > bestScore)
+			{
+				for (int i = 0; i < 2; i++)
+				{
+
+					//server->SendGlobalMessage(StringPacket("Server  OUT"));
+
+					client->SendPacket(StringPacket("1 " + std::to_string(score)));
+
+					server->UpdateServer();
+
+					client->UpdateClient();
+
+				}
+
+			}
+		}
+	}
+}
+
+void NCL::CSC8503::TutorialGame::UpdateEnemy()
+{
+	if (world->GetEnemy())
+	{
+		if (physics->getGravityState() && world->myTimer > 3 && !ifWin)
+		{
+			Enemy_Chase(world->GetEnemy(), world->GetPlayer());
+
+		}
+	}
+}
+
+void NCL::CSC8503::TutorialGame::UpdateWall()
+{
+	if (world->GetMoveWall(0) && world->GetMoveWall(1))
+		FSM_MoveWall(mytime, world);
 }
 
 
@@ -692,13 +701,13 @@ void TutorialGame::InitCourt() {
 		world->SetObsMoveWall(AddObstacleToWorld(posMoveWall_B, OBS_MoveWall, 0.0f), 1);
 
 		//EnemyCube
-		Vector3 ePos(200, depth * 5, 0);
+		Vector3 ePos(0, depth * 2, 0);
 		float eRadius = 20.0f;
 		world->SetEnemy(AddEnemyToWorld(ePos, eRadius, 1.05f));
 
 
 		//PlayerBall
-		Vector3 ballPos(-100, depth * 5, 0);
+		Vector3 ballPos(-500, depth * 5, 0);
 		float radius = (20.0f);
 		world->SetPlayer(AddSphereToWorld(ballPos, radius, 0.05f));
 		world->GetPlayer()->SetName("player");
@@ -963,7 +972,7 @@ bool TutorialGame::SelectObject() {
 			Window::GetWindow()->LockMouseToWindow(true);
 		}
 	}
-	if (inSelectionMode) {
+	if (inSelectionMode&&GameRunning) {
 		renderer->DrawString("Press Q to change to camera mode!", Vector2(10, 0));
 
 		if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::MOUSE_LEFT)) {
@@ -995,6 +1004,7 @@ bool TutorialGame::SelectObject() {
 		}
 	}
 	else {
+		if(GameRunning)
 		renderer->DrawString("Press Q to change to select mode!", Vector2(10, 0));
 	}
 	return false;
@@ -1008,8 +1018,11 @@ line - after the third, they'll be able to twist under torque aswell.
 */
 
 void TutorialGame::MoveSelectedObject() {
-	renderer->DrawString("Click Force:" + std::to_string(forceMagnitude), Vector2(10, 20));
-	forceMagnitude += Window::GetMouse()->GetWheelMovement() * 10.0f;
+	if (GameRunning)
+	{
+		renderer->DrawString("Click Force:" + std::to_string(forceMagnitude), Vector2(10, 20));
+		forceMagnitude += Window::GetMouse()->GetWheelMovement() * 10.0f;
+	}
 
 	
 	Vector3 forceRayDir;

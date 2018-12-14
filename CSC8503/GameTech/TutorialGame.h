@@ -43,6 +43,13 @@ namespace NCL {
 			void UpdateKeys();
 			
 			void InitWorld();
+			void UI();
+			void ScoreCalculating();
+			void TimeCalculating(float dt);
+			void LevelSwitch();
+			void UpdateEnemy();
+			void UpdateWall();
+
 			
 
 			/*
@@ -90,6 +97,7 @@ namespace NCL {
 			float axisYoffset;
 			bool useGravity;
 			bool inSelectionMode;
+			bool GameRunning;
 
 			float		forceMagnitude;
 

@@ -154,6 +154,15 @@ void PhysicsSystem::BasicCollisionDetection() {
 				info.framesLeft = numCollisionFrames; 
 				allCollisions.insert(info); 
 				
+
+				if ((*j)->GetName() == "floor" && (*i)->GetName() == "enemy")
+				{
+
+					//std::cout << "next level" << std::endl;
+					enemyTouchFloor= true;
+				}
+
+
 				if ((*j)->GetName() == "floor" && (*i)->GetName() == "player")
 				{
 
