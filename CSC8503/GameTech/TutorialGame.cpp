@@ -411,14 +411,14 @@ GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimens
 	cube->GetTransform().SetWorldPosition(position);
 	cube->GetTransform().SetWorldScale(dimensions);
 
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, obsTex, basicShader));
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
 
 	cube->GetPhysicsObject()->SetInverseMass(inverseMass);
 	cube->GetPhysicsObject()->InitCubeInertia();
 
 	world->AddGameObject(cube);
-
+	cube->SetName("cube");
 	return cube;
 }
 
@@ -564,6 +564,8 @@ void TutorialGame::InitCourt() {
 		world->GetMainCamera()->SetPosition(newCamPos);
 		//Floor
 		AddFloorToWorld(Vector3(10, -10, 1));
+
+		BridgeConstraintTest();
 	}
 
 	if (myLevel == 2)
@@ -796,7 +798,8 @@ bool TutorialGame::SelectObject() {
 				if (selectionObject->GetName() == "floor" 
 					|| selectionObject->GetName()== "terrain" 
 					|| selectionObject->GetName() == "wall"
-					|| selectionObject->GetName() == "enemy") return false;
+					|| selectionObject->GetName() == "enemy"
+					|| selectionObject->GetName() == "cube") return false;
 
 				selectionObject->GetRenderObject()->SetColour(Vector4(1, 0, 0, 1));
 				return true;
@@ -896,6 +899,27 @@ void TutorialGame::MoveSelectedObject() {
 		//	}
 		//}
 	}
+}
+
+void NCL::CSC8503::TutorialGame::BridgeConstraintTest()
+{
+	Vector3 cubeSize = Vector3(15, 15, 800); 
+	float invCubeMass = 0; //how heavy the middle pieces are 
+	int numLinks = 5; 
+	float maxDistance = 70; //constraint distance
+	float cubeDistance = 40; //distance between links
+	Vector3 startPos = Vector3(100, 25, 0); 
+	GameObject* start = AddCubeToWorld(startPos + Vector3(0, 0, 0) , cubeSize , 0); 
+	GameObject* end = AddCubeToWorld(startPos + Vector3((numLinks + 1)  * cubeDistance , 0, 0), cubeSize , 0);
+	GameObject* previous = start; 
+	for (int i = 0; i < numLinks; ++i) { 
+		GameObject* block = AddCubeToWorld(startPos + Vector3((i+1) * cubeDistance , i*25, 0), cubeSize , invCubeMass); 
+		PositionConstraint* constraint =new PositionConstraint(previous ,  block , maxDistance); 
+		world ->AddConstraint(constraint); 
+		previous = block; 
+	} 
+	PositionConstraint* constraint = new PositionConstraint(previous ,  end, maxDistance); 
+	world ->AddConstraint(constraint); 
 }
 
 

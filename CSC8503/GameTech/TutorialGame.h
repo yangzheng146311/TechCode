@@ -60,7 +60,7 @@ namespace NCL {
 			bool SelectObject();
 			void MoveSelectedObject();
 		
-			
+			void BridgeConstraintTest();
 
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
