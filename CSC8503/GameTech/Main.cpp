@@ -145,7 +145,7 @@ hide or show the
 
 int main() {
 	Window*w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720);
-	//int stack = 1;
+	
 	
 	if (!w->HasInitialised()) {
 		return -1;
@@ -163,12 +163,6 @@ int main() {
 
 		float dt = w->GetTimer()->GetTimeDelta() / 1000.0f;
 		
-		//if (Window::GetKeyboard()->KeyDown(KEYBOARD_N)) stack = 2;
-		//if (Window::GetKeyboard()->KeyDown(KEYBOARD_J)) stack = 1;
-
-		//if (stack == 2) dt = 1.1f;
-
-
 		if (dt > 1.0f) {
 			continue; //must have hit a breakpoint or something to have a 1 second frame time!
 		}
@@ -179,21 +173,14 @@ int main() {
 			w->ShowConsole(false);
 		}
 
-		DisplayPathfinding();
+		//DisplayPathfinding();
 
 		w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
 
-
-
-
-
 		g->UpdateGame(dt);
 	}
-	//std::cout << g->score << std::endl;
 	
 	
-
-
 
 
 	Window::DestroyGameWindow();
