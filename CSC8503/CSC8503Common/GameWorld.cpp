@@ -23,12 +23,16 @@ GameWorld::~GameWorld()	{
 
 void GameWorld::Clear() {
 	gameObjects.clear();
+	constraints.clear(); //new line! 
 }
 
 void GameWorld::ClearAndErase() {
 	for (auto& i : gameObjects) {
 		delete i;
 	}
+	for (auto& i : constraints) {
+		 delete i; //new for loop!
+	} 
 	Clear();
 }
 

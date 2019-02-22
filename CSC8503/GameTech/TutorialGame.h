@@ -49,29 +49,10 @@ namespace NCL {
 			void LevelSwitch();
 			void UpdateEnemy();
 			void UpdateWall();
-
-			
-
-			/*
-			These are some of the world/object creation functions I created when testing the functionality
-			in the module. Feel free to mess around with them to see different objects being created in different
-			test scenarios (constraints, collision types, and so on). 
-			*/
-			void InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius);
-			
-			void InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing);
-			void InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims);
 			void InitTerrain(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims);
 			void InitCourt();
 			
-			void InitSphereCollisionTorqueTest();
-			void InitCubeCollisionTorqueTest();
-			void InitSphereAABBTest();
-			void InitGJKWorld();
-			void BridgeConstraintTest();
-			void SimpleGJKTest();
-			void SimpleAABBTest();
-			void SimpleAABBTest2();
+			
 
 			void CamFollow(Camera *c, GameObject *obj);
 			void FSM_MoveWall(int &time, GameWorld *g);
@@ -79,7 +60,7 @@ namespace NCL {
 			bool SelectObject();
 			void MoveSelectedObject();
 		
-			
+			void BridgeConstraintTest();
 
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
