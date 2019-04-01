@@ -126,9 +126,9 @@ void GameWorld::RemoveConstraint(Constraint* c) {
 	std::remove(constraints.begin(), constraints.end(), c);
 }
 
-//void GameWorld::GetConstraintIterators(
-//	std::vector<Constraint*>::const_iterator& first,
-//	std::vector<Constraint*>::const_iterator& last) const {
-//	first	= constraints.begin();
-//	last	= constraints.end();
-//}
+void GameWorld::GetConstraintIterators(
+	std::vector<Constraint*>::const_iterator& first,
+	std::vector<Constraint*>::const_iterator& last) const {
+	first	= constraints.begin();
+	last	= constraints.end();
+}
